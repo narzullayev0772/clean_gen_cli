@@ -1,0 +1,8 @@
+name: clean_feature
+description: A clean architecture feature brick.
+vars:
+  name:
+    type: string
+    description: The name of the feature
+    default: my_feature
+    prompt: What is the name of the feature?

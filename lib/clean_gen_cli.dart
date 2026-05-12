@@ -1,3 +1,4 @@
-int calculate() {
-  return 6 * 7;
-}
+/// Clean Gen CLI - A tool to generate clean architecture folders and code.
+library;
+
+export 'generator/clean_generator.dart';

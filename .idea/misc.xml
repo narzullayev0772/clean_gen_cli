@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GitLabDefaultAccount">
+    <option name="defaultAccountId" value="725af1d3-7eb0-4081-adc8-9ce838959eb6" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="StoredSessionsInfoStore">
+    <option name="sessions">
+      <list>
+        <SessionInfoState>
+          <option name="id" value="20260428-102727-319369a2-f642-4cf9-a2e6-5ac96b6f0a48" />
+          <option name="lastUpdateTimestamp" value="1777354047673" />
+          <option name="responseMode" value="Agent" />
+          <option name="title" value="New Agent Session" />
+          <option name="user" value="alishernarzullayev7777@gmail.com" />
+        </SessionInfoState>
+      </list>
+    </option>
+  </component>
+</project>
