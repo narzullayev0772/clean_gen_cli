@@ -1,47 +1,36 @@
-import 'dart:io';
-import 'dart:isolate';
-import 'package:mason/mason.dart';
+import 'package:clean_gen_cli/generator/base_generator.dart';
 import 'package:path/path.dart' as p;
+import 'package:recase/recase.dart';
 
-class CleanGenerator {
-  final Logger _logger;
+class CleanGenerator extends BaseGenerator {
+  CleanGenerator({super.logger});
 
-  CleanGenerator({Logger? logger}) : _logger = logger ?? Logger();
+  /// Generates the complete feature structure and files based on uyqur_app style.
+  Future<void> generateFullFeature(String featureName, String outputPath, {bool useCubit = true}) async {
+    await generate(
+      brickName: 'clean_feature',
+      vars: {
+        'name': featureName,
+        'use_cubit': useCubit,
+      },
+      targetDirectory: p.join(outputPath, featureName.snakeCase),
+    );
+  }
 
-  Future<void> generate(String featureName, String outputPath) async {
-    final progress = _logger.progress('Generating clean architecture folders for $featureName');
+  /// Legacy support for generating only folders (updated to new structure)
+  Future<void> generateFolders(String featureName, String outputPath) async {
+    // In the new version, generateFullFeature handles everything, 
+    // but if we only want folders, we can use this.
+    // For now, let's keep it simple and use the main brick.
+    await generateFullFeature(featureName, outputPath);
+  }
 
-    try {
-      final packageUri = Uri.parse('package:clean_gen_cli/templates/clean_feature');
-      final resolvedUri = await Isolate.resolvePackageUri(packageUri);
-      
-      if (resolvedUri == null) {
-        progress.fail('Could not resolve templates. Make sure the package is correctly installed.');
-        return;
-      }
-
-      final brickPath = resolvedUri.toFilePath();
-
-      if (!Directory(brickPath).existsSync()) {
-        progress.fail('Template not found at $brickPath');
-        return;
-      }
-
-      final generator = await MasonGenerator.fromBrick(Brick.path(brickPath));
-      final target = DirectoryGeneratorTarget(
-        Directory(p.join(outputPath, featureName.snakeCase)),
-      );
-
-      // We use await to ensure the progress shows until completion
-      await generator.generate(
-        target,
-        vars: {'name': featureName},
-      );
-
-      progress.complete('Successfully generated clean architecture folders for $featureName');
-    } catch (e) {
-      progress.fail('Failed to generate: $e');
-      _logger.err(e.toString());
-    }
+  /// Legacy support for generating code files separately
+  Future<void> generateCode({
+    required String featureName,
+    required String outputPath,
+    bool useCubit = true,
+  }) async {
+    await generateFullFeature(featureName, outputPath, useCubit: useCubit);
   }
 }

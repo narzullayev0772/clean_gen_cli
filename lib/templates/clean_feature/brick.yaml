@@ -1,9 +1,11 @@
 name: clean_feature
-description: A clean architecture feature brick.
+description: A clean architecture feature brick based on uyqur_app structure.
 version: 0.1.0+1
 vars:
   name:
     type: string
     description: The name of the feature
-    default: my_feature
-    prompt: What is the name of the feature?
+  use_cubit:
+    type: boolean
+    description: Whether to use Cubit instead of Bloc
+    default: true

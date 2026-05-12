@@ -3,20 +3,25 @@ import 'package:clean_gen_cli/generator/clean_generator.dart';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as p;
 
-class CleanGenCommand extends Command<void> {
+class CreateCommand extends Command<void> {
   final Logger _logger;
-  
-  @override
-  final String name = 'generate';
-  @override
-  final String description = 'Generates clean architecture folders.';
 
-  CleanGenCommand({Logger? logger}) : _logger = logger ?? Logger() {
+  @override
+  final String name = 'create';
+  @override
+  final String description = 'Generates clean architecture files (DI, Bloc, UseCase).';
+
+  CreateCommand({Logger? logger}) : _logger = logger ?? Logger() {
     argParser.addOption(
       'output',
       abbr: 'o',
       defaultsTo: 'lib/src/features/',
-      help: 'Output path for the generated folders.',
+      help: 'Output path for the generated files.',
+    );
+    argParser.addFlag(
+      'cubit',
+      help: 'Generate Cubit instead of Bloc.',
+      defaultsTo: false,
     );
   }
 
@@ -28,8 +33,9 @@ class CleanGenCommand extends Command<void> {
 
     final input = argResults!.rest.first;
     final baseOutputPath = argResults!['output'] as String;
+    final useCubit = argResults!['cubit'] as bool;
 
-    // Handle nested paths in feature name
+    // Handle nested paths in feature name (e.g., apps/warehouse/transfer)
     final featureName = p.basename(input);
     final relativePath = p.dirname(input);
     
@@ -38,6 +44,12 @@ class CleanGenCommand extends Command<void> {
         : p.join(baseOutputPath, relativePath);
 
     final generator = CleanGenerator(logger: _logger);
-    await generator.generateFolders(featureName, outputPath);
+    
+    // Generate the complete feature structure and files
+    await generator.generateFullFeature(
+      featureName,
+      outputPath,
+      useCubit: useCubit,
+    );
   }
 }
