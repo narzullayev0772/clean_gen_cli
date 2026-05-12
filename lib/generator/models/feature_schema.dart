@@ -23,8 +23,8 @@ class FunctionDef {
   final String name;
   final String api;
   final String method;
-  final Map<String, dynamic>? request;
-  final Map<String, dynamic>? response;
+  final dynamic request; // Can be Map or List
+  final dynamic response; // Can be Map or List
   final bool pagination;
 
   FunctionDef({
@@ -41,8 +41,8 @@ class FunctionDef {
       name: json['name'] as String,
       api: json['api'] as String,
       method: (json['method'] as String?) ?? 'GET',
-      request: json['request'] as Map<String, dynamic>?,
-      response: json['response'] as Map<String, dynamic>?,
+      request: json['request'], // Accept both Map and List
+      response: json['response'], // Accept both Map and List
       pagination: (json['pagination'] as bool?) ?? false,
     );
   }
