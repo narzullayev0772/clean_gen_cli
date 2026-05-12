@@ -1,5 +1,5 @@
 import 'package:args/command_runner.dart';
-import 'package:clean_gen_cli/cli/commands/init_command.dart';
+import 'package:clean_gen_cli/cli/commands/create_command.dart';
 import 'package:mason/mason.dart';
 
 class CleanGenCommandRunner extends CommandRunner<void> {
@@ -7,7 +7,7 @@ class CleanGenCommandRunner extends CommandRunner<void> {
 
   CleanGenCommandRunner({Logger? logger})
       : _logger = logger ?? Logger(),
-        super('clean_gen', 'A CLI tool to generate clean architecture folders.') {
-    addCommand(InitCommand(logger: _logger));
+        super('clean_gen', 'A CLI tool to generate clean architecture features from config files.') {
+    addCommand(CreateCommand(logger: _logger));
   }
 }
