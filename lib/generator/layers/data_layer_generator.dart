@@ -55,7 +55,8 @@ class DataLayerGenerator {
     String featureName,
     List<FunctionDef> functions,
   ) async {
-    final modelsPath = p.join(dataPath, 'models');
+    final requestsPath = p.join(dataPath, 'models', 'requests');
+    final responsesPath = p.join(dataPath, 'models', 'responses');
 
     // Generate request and response models for each function
     for (final function in functions) {
@@ -65,7 +66,7 @@ class DataLayerGenerator {
         if (requestModel.isNotEmpty) {
           final fileName = '${FileWriter.toSnakeCase(function.name)}_request.dart';
           await FileWriter.createDartFile(
-            dirPath: modelsPath,
+            dirPath: requestsPath,
             fileName: fileName,
             content: requestModel,
           );
@@ -78,7 +79,7 @@ class DataLayerGenerator {
         if (responseModel.isNotEmpty) {
           final fileName = '${FileWriter.toSnakeCase(function.name)}_model.dart';
           await FileWriter.createDartFile(
-            dirPath: modelsPath,
+            dirPath: responsesPath,
             fileName: fileName,
             content: responseModel,
           );

@@ -10,9 +10,11 @@ class UseCaseTemplate {
     final requestType = ModelGenerator.getRequestModelType(function);
     final responseType = ModelGenerator.getResponseModelType(function);
     final returnType = responseType == 'dynamic' ? 'dynamic' : '$responseType?';
+    final modelImports = _generateModelImports(function, '../../data/models');
 
     return '''import 'package:core/core.dart';
 import '../../repositories/${FileWriter.toSnakeCase(featureName)}_repository.dart';
+$modelImports
 
 class $className implements UseCase<DataState<$returnType>, $requestType> {
   final $repoName _repository;
@@ -25,5 +27,17 @@ class $className implements UseCase<DataState<$returnType>, $requestType> {
 }
 ''';
   }
+
+  static String _generateModelImports(FunctionDef function, String relativePath) {
+    final imports = <String>{};
+    if (function.request != null) {
+      imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(function.name)}_request.dart';");
+    }
+    if (function.response != null) {
+      imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';");
+    }
+    return imports.join('\n');
+  }
 }
+
 

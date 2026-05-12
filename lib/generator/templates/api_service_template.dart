@@ -9,10 +9,12 @@ class ApiServiceTemplate {
 
     final urlConstants = _generateUrlConstants(functions);
     final requestMethods = _generateRequestMethods(functions);
+    final modelImports = _generateModelImports(functions);
 
     return '''import 'package:core/resources/base_response.dart';
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
+$modelImports
 
 part '${FileWriter.toSnakeCase(featureName)}_api_service.g.dart';
 
@@ -58,6 +60,19 @@ $requestMethods
     }).join('\n\n  ');
 
     return methods;
+  }
+
+  static String _generateModelImports(List<FunctionDef> functions) {
+    final imports = <String>{};
+    for (final f in functions) {
+      if (f.request != null) {
+        imports.add("import '../models/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
+      }
+      if (f.response != null) {
+        imports.add("import '../models/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
+      }
+    }
+    return imports.join('\n');
   }
 }
 

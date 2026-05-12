@@ -13,6 +13,7 @@ class CubitTemplate {
     final dependencies = _generateDependencies(functions);
     final constructor = _generateConstructor(className, functions);
     final methods = _generateMethods(functions, camelName);
+    final modelImports = _generateModelImports(functions, '../../data/models');
 
     final useCaseImports = functions
         .map((f) => "import '../../../domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
@@ -25,6 +26,7 @@ import 'package:core/resources/base_query.dart';
 import 'package:core/resources/base_pagination_state.dart';
 import '../../../../core/utils/fetcher.dart';
 $useCaseImports
+$modelImports
 
 part '${snakeName}_state.dart';
 
@@ -84,12 +86,27 @@ $methods
       }
     }).join('\n');
   }
+
+  static String _generateModelImports(List<FunctionDef> functions, String relativePath) {
+    final imports = <String>{};
+    for (final f in functions) {
+      if (f.request != null) {
+        imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
+      }
+      if (f.response != null) {
+        imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
+      }
+    }
+    return imports.join('\n');
+  }
 }
 
 class CubitStateTemplate {
   static String generate(String featureName, List<FunctionDef> functions) {
     final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
     final stateName = '${camelName}State';
+
+    final modelImports = CubitTemplate._generateModelImports(functions, '../../data/models');
 
     final fields = functions.map((f) {
       final responseType = ModelGenerator.getResponseModelType(f);
@@ -117,6 +134,8 @@ class CubitStateTemplate {
     }).join('\n');
 
     return '''part of '${FileWriter.toSnakeCase(featureName)}_cubit.dart';
+
+$modelImports
 
 class $stateName {
 $fields

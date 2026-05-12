@@ -15,7 +15,10 @@ class RepositoryTemplate {
       return '  Future<DataState<$returnType>> $methodName($requestType params);';
     }).join('\n');
 
+    final modelImports = _generateModelImports(functions, '../../data/models');
+
     return '''import 'package:core/resources/data_state.dart';
+$modelImports
 
 abstract class $className {
 $methods
@@ -46,9 +49,12 @@ class RepositoryImplTemplate {
       await handleResponse(response: _apiService.$methodName(${hasRequest ? 'params' : ''}));''';
     }).join('\n');
 
+    final modelImports = _generateModelImports(functions, '../models');
+
     return '''import 'package:core/core.dart';
 import '../data_sources/${snakeName}_api_service.dart';
 import '../../domain/repositories/${snakeName}_repository.dart';
+$modelImports
 
 class $implClassName with BaseRepository implements $className {
   final $apiServiceName _apiService;
@@ -60,6 +66,21 @@ $methods
 ''';
   }
 }
+
+String _generateModelImports(List<FunctionDef> functions, String relativePath) {
+  final imports = <String>{};
+  for (final f in functions) {
+    if (f.request != null) {
+      imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
+    }
+    if (f.response != null) {
+      imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
+    }
+  }
+  return imports.join('\n');
+}
+
+
 
 
 
