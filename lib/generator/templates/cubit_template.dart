@@ -15,9 +15,10 @@ class CubitTemplate {
     final methods = _generateMethods(functions, camelName);
     final modelImports = _generateModelImports(functions, '../../data/models');
 
-    final useCaseImports = functions
+    final useCaseImportsList = functions
         .map((f) => "import '../../../domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
-        .join('\n');
+        .toList()..sort();
+    final useCaseImports = useCaseImportsList.join('\n');
 
     return '''import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
@@ -97,7 +98,8 @@ $methods
         imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
       }
     }
-    return imports.join('\n');
+    final sortedImports = imports.toList()..sort();
+    return sortedImports.join('\n');
   }
 }
 

@@ -36,7 +36,8 @@ class $className implements UseCase<DataState<$returnType>, $requestType> {
     if (function.response != null) {
       imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';");
     }
-    return imports.join('\n');
+    final sortedImports = imports.toList()..sort();
+    return sortedImports.join('\n');
   }
 }
 

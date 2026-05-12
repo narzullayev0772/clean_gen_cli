@@ -72,7 +72,8 @@ $requestMethods
         imports.add("import '../models/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
       }
     }
-    return imports.join('\n');
+    final sortedImports = imports.toList()..sort();
+    return sortedImports.join('\n');
   }
 }
 

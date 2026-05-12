@@ -77,11 +77,6 @@ String _generateModelImports(List<FunctionDef> functions, String relativePath) {
       imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
     }
   }
-  return imports.join('\n');
+  final sortedImports = imports.toList()..sort();
+  return sortedImports.join('\n');
 }
-
-
-
-
-
-
