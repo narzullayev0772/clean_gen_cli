@@ -16,14 +16,11 @@ class DITemplate {
         .map((f) => "import 'domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
         .join('\n');
 
-    return '''import 'package:get_it/get_it.dart';
-import 'data/data_sources/${snakeName}_api_service.dart';
+    return '''import 'data/data_sources/${snakeName}_api_service.dart';
 import 'data/repositories/${snakeName}_repository_impl.dart';
 import 'domain/repositories/${snakeName}_repository.dart';
 $useCaseImports
 import 'presentation/cubit/${snakeName}_cubit.dart';
-
-final locator = GetIt.instance;
 
 Future<void> $functionName() async {
   // DataSources

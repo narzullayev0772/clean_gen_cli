@@ -17,7 +17,7 @@ class RepositoryTemplate {
 
     final modelImports = _generateModelImports(functions, '../../data/models');
 
-    return '''import 'package:core/resources/data_state.dart';
+    return '''
 $modelImports
 
 abstract class $className {
@@ -51,8 +51,7 @@ class RepositoryImplTemplate {
 
     final modelImports = _generateModelImports(functions, '../models');
 
-    return '''import 'package:core/core.dart';
-import '../data_sources/${snakeName}_api_service.dart';
+    return '''import '../data_sources/${snakeName}_api_service.dart';
 import '../../domain/repositories/${snakeName}_repository.dart';
 $modelImports
 

@@ -11,8 +11,7 @@ class ApiServiceTemplate {
     final requestMethods = _generateRequestMethods(functions);
     final modelImports = _generateModelImports(functions);
 
-    return '''import 'package:core/resources/base_response.dart';
-import 'package:dio/dio.dart';
+    return '''import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 $modelImports
 

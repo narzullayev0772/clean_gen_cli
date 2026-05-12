@@ -16,16 +16,11 @@ class CubitTemplate {
     final modelImports = _generateModelImports(functions, '../../data/models');
 
     final useCaseImportsList = functions
-        .map((f) => "import '../../../domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
+        .map((f) => "import '../../domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
         .toList()..sort();
     final useCaseImports = useCaseImportsList.join('\n');
 
     return '''import 'package:bloc/bloc.dart';
-import 'package:core/core.dart';
-import 'package:core/resources/base_state.dart';
-import 'package:core/resources/base_query.dart';
-import 'package:core/resources/base_pagination_state.dart';
-import '../../../../core/utils/fetcher.dart';
 $useCaseImports
 $modelImports
 
@@ -107,8 +102,6 @@ class CubitStateTemplate {
   static String generate(String featureName, List<FunctionDef> functions) {
     final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
     final stateName = '${camelName}State';
-
-    final modelImports = CubitTemplate._generateModelImports(functions, '../../data/models');
 
     final fields = functions.map((f) {
       final responseType = ModelGenerator.getResponseModelType(f);
