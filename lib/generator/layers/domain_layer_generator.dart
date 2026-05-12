@@ -1,8 +1,10 @@
 import 'package:path/path.dart' as p;
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
-import 'package:clean_gen_cli/generator/templates/usecase_template.dart';
+import 'package:clean_gen_cli/generator/templates/repository_template.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 import 'package:mason/mason.dart';
+
+import '../templates/usecase_template.dart';
 
 class DomainLayerGenerator {
   final Logger logger;
@@ -18,7 +20,7 @@ class DomainLayerGenerator {
       final domainPath = p.join(basePath, 'domain');
 
       // Generate Repository interface
-      await _generateRepositoryInterface(domainPath, featureName);
+      await _generateRepositoryInterface(domainPath, featureName, functions);
 
       // Generate UseCases
       await _generateUseCases(domainPath, featureName, functions);
@@ -33,16 +35,15 @@ class DomainLayerGenerator {
     }
   }
 
-  Future<void> _generateRepositoryInterface(String domainPath, String featureName) async {
+  Future<void> _generateRepositoryInterface(
+    String domainPath,
+    String featureName,
+    List<FunctionDef> functions,
+  ) async {
     final snakeName = FileWriter.toSnakeCase(featureName);
     final repoPath = p.join(domainPath, 'repositories');
 
-    final content = '''import 'package:core/resources/data_state.dart';
-
-abstract class ${FileWriter.toCamelCase(snakeName)}Repository {
-  // TODO: Define repository abstract methods
-}
-''';
+    final content = RepositoryTemplate.generate(featureName, functions);
 
     await FileWriter.createDartFile(
       dirPath: repoPath,
@@ -69,25 +70,6 @@ abstract class ${FileWriter.toCamelCase(snakeName)}Repository {
         content: content,
       );
     }
-
-    // Generate index file for easier imports
-    await _generateUseCaseIndex(useCasesPath, functions);
-  }
-
-  Future<void> _generateUseCaseIndex(String useCasesPath, List<FunctionDef> functions) async {
-    final imports = functions
-        .map((f) => "export '${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
-        .join('\n');
-
-    final content = '''// Export all use cases
-$imports
-''';
-
-    await FileWriter.createDartFile(
-      dirPath: useCasesPath,
-      fileName: 'index.dart',
-      content: content,
-    );
   }
 
   Future<void> _generateEntities(String domainPath, String featureName) async {

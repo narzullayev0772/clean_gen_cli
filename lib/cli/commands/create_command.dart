@@ -83,7 +83,7 @@ class CreateCommand extends Command<void> {
       final featureOutputPath = p.join(outputPath, featureName);
 
       // Create feature directory structure
-      await _initializeFeature(featureOutputPath, featureName);
+      await _initializeFeature(featureOutputPath, featureName, schema.functions.isNotEmpty);
 
       // If functions exist, generate all files
       if (schema.functions.isNotEmpty) {
@@ -116,7 +116,7 @@ class CreateCommand extends Command<void> {
     return '';
   }
 
-  Future<void> _initializeFeature(String basePath, String featureName) async {
+  Future<void> _initializeFeature(String basePath, String featureName, bool hasFunctions) async {
     final progress = _logger.progress('Initializing architecture...');
 
     try {
@@ -128,28 +128,21 @@ class CreateCommand extends Command<void> {
 
       // Define folder structure
       final folders = [
-        'data/datasources',
+        'data/data_sources',
         'data/models',
         'data/repositories',
         'domain/entities',
         'domain/repositories',
-        'domain/usecases',
+        'domain/use_cases',
         'presentation/cubit',
         'presentation/pages',
         'presentation/widgets',
-        'di',
       ];
 
       // Create all folders
       for (final folder in folders) {
         final folderPath = p.join(basePath, folder);
         Directory(folderPath).createSync(recursive: true);
-      }
-
-   // Create .gitkeep files
-      for (final folder in folders) {
-        final gitkeepPath = p.join(basePath, folder, '.gitkeep');
-        await File(gitkeepPath).create(recursive: true);
       }
 
       progress.complete('Architecture initialized');

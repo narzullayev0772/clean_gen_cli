@@ -10,13 +10,17 @@ class DITemplate {
     final apiServiceRegistration = _generateApiServiceRegistration(camelName);
     final repositoryRegistration = _generateRepositoryRegistration(camelName);
     final useCaseRegistrations = _generateUseCaseRegistrations(functions, camelName);
-    final cubitsRegistration = _generateCubitsRegistration(camelName);
+    final cubitsRegistration = _generateCubitsRegistration(functions, camelName);
+
+    final useCaseImports = functions
+        .map((f) => "import 'domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
+        .join('\n');
 
     return '''import 'package:get_it/get_it.dart';
 import 'data/data_sources/${snakeName}_api_service.dart';
 import 'data/repositories/${snakeName}_repository_impl.dart';
 import 'domain/repositories/${snakeName}_repository.dart';
-import 'domain/use_cases/index.dart';
+$useCaseImports
 import 'presentation/cubit/${snakeName}_cubit.dart';
 
 final locator = GetIt.instance;
@@ -59,10 +63,14 @@ $cubitsRegistration
     return registrations;
   }
 
-  static String _generateCubitsRegistration(String camelName) {
+  static String _generateCubitsRegistration(List<FunctionDef> functions, String camelName) {
+    final useCases = functions
+        .map((f) => "locator()")
+        .join(',\n      ');
+
     return '''  locator.registerFactory<${camelName}Cubit>(
     () => ${camelName}Cubit(
-      // Add use case dependencies here
+      $useCases
     ),
   );''';
   }

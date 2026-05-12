@@ -50,7 +50,7 @@ class PresentationLayerGenerator {
     );
 
     // Generate State
-    final stateContent = CubitStateTemplate.generate(featureName);
+    final stateContent = CubitStateTemplate.generate(featureName, functions);
     await FileWriter.createDartFile(
       dirPath: managerPath,
       fileName: '${snakeName}_state.dart',

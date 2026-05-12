@@ -74,7 +74,7 @@ class $modelName {
 
     final modelName = '${FileWriter.toCamelCase(function.name)}Model';
 
-    if (function.response is List) {
+    if (function.response is List || function.pagination) {
       return 'List<$modelName>';
     }
 

@@ -22,14 +22,11 @@ class DataLayerGenerator {
       // Generate API Service
       await _generateApiService(dataPath, featureName, functions);
 
-      // Generate Models (placeholder)
-      await _generateModels(dataPath, featureName);
-
-      // Generate Bodies (placeholder)
-      await _generateBodies(dataPath, featureName, functions);
+      // Generate Models
+      await _generateModels(dataPath, featureName, functions);
 
       // Generate Repository
-      await _generateRepository(dataPath, featureName);
+      await _generateRepository(dataPath, featureName, functions);
 
       logger.info('✓ Data layer generated for $featureName');
     } catch (e) {
@@ -53,29 +50,12 @@ class DataLayerGenerator {
     );
   }
 
-  Future<void> _generateModels(String dataPath, String featureName) async {
-    // Create models directory with index file
-    final modelsPath = p.join(dataPath, 'models');
-
-    // Create index file for models
-    await FileWriter.createDartFile(
-      dirPath: modelsPath,
-      fileName: 'index.dart',
-      content: '''// Export all models
-// Add your model exports here
-// Example:
-// export 'user_model.dart';
-// export 'product_model.dart';
-''',
-    );
-  }
-
-  Future<void> _generateBodies(
+  Future<void> _generateModels(
     String dataPath,
     String featureName,
     List<FunctionDef> functions,
   ) async {
-    final bodiesPath = p.join(dataPath, 'bodies');
+    final modelsPath = p.join(dataPath, 'models');
 
     // Generate request and response models for each function
     for (final function in functions) {
@@ -85,7 +65,7 @@ class DataLayerGenerator {
         if (requestModel.isNotEmpty) {
           final fileName = '${FileWriter.toSnakeCase(function.name)}_request.dart';
           await FileWriter.createDartFile(
-            dirPath: bodiesPath,
+            dirPath: modelsPath,
             fileName: fileName,
             content: requestModel,
           );
@@ -98,7 +78,7 @@ class DataLayerGenerator {
         if (responseModel.isNotEmpty) {
           final fileName = '${FileWriter.toSnakeCase(function.name)}_model.dart';
           await FileWriter.createDartFile(
-            dirPath: bodiesPath,
+            dirPath: modelsPath,
             fileName: fileName,
             content: responseModel,
           );
@@ -107,12 +87,16 @@ class DataLayerGenerator {
     }
   }
 
-  Future<void> _generateRepository(String dataPath, String featureName) async {
+  Future<void> _generateRepository(
+    String dataPath,
+    String featureName,
+    List<FunctionDef> functions,
+  ) async {
     final snakeName = FileWriter.toSnakeCase(featureName);
 
 
     // Repository implementation
-    final implContent = RepositoryImplTemplate.generate(featureName);
+    final implContent = RepositoryImplTemplate.generate(featureName, functions);
     await FileWriter.createDartFile(
       dirPath: p.join(dataPath, 'repositories'),
       fileName: '${snakeName}_repository_impl.dart',

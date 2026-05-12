@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:path/path.dart' as p;
 import 'package:clean_gen_cli/generator/layers/data_layer_generator.dart';
 import 'package:clean_gen_cli/generator/layers/domain_layer_generator.dart';
 import 'package:clean_gen_cli/generator/layers/presentation_layer_generator.dart';
@@ -71,12 +70,6 @@ class FeatureGenerator {
     final dir = Directory(basePath);
     if (!dir.existsSync()) {
       throw Exception('Feature directory not found: $basePath');
-    }
-
-    // Check if .arch.json exists
-    final archFile = File(p.join(basePath, '.arch.json'));
-    if (!archFile.existsSync()) {
-      throw Exception('.arch.json not found in feature directory');
     }
   }
 
