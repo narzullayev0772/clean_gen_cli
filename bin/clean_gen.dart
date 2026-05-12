@@ -1,17 +1,16 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:clean_gen_cli/generator/clean_generator.dart';
+import 'package:mason/mason.dart';
 
 void main(List<String> arguments) async {
   final parser = ArgParser();
-  
-  // We can add options here if needed, but the user asked for positional arguments.
-  // clean_gen <feature_name> <output_path>
+  final logger = Logger();
   
   final results = parser.parse(arguments);
   
   if (results.rest.isEmpty) {
-    print('Usage: clean_gen <feature_name> [output_path]');
+    logger.info('Usage: clean_gen <feature_name> [output_path]');
     exit(64);
   }
 
@@ -20,6 +19,6 @@ void main(List<String> arguments) async {
       ? results.rest[1] 
       : 'lib/src/features/';
 
-  final generator = CleanGenerator();
+  final generator = CleanGenerator(logger: logger);
   await generator.generate(featureName, outputPath);
 }

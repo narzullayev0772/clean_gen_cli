@@ -4,24 +4,26 @@ import 'package:mason/mason.dart';
 import 'package:path/path.dart' as p;
 
 class CleanGenerator {
+  final Logger _logger;
+
+  CleanGenerator({Logger? logger}) : _logger = logger ?? Logger();
+
   Future<void> generate(String featureName, String outputPath) async {
-    final logger = Logger();
-    final progress = logger.progress('Generating clean architecture folders for $featureName');
+    final progress = _logger.progress('Generating clean architecture folders for $featureName');
 
     try {
       final packageUri = Uri.parse('package:clean_gen_cli/templates/clean_feature');
       final resolvedUri = await Isolate.resolvePackageUri(packageUri);
       
       if (resolvedUri == null) {
-        progress.fail('Could not resolve package:clean_gen_cli/templates/clean_feature');
+        progress.fail('Could not resolve templates. Make sure the package is correctly installed.');
         return;
       }
 
       final brickPath = resolvedUri.toFilePath();
 
       if (!Directory(brickPath).existsSync()) {
-        // Fallback or handle error
-        progress.fail('Brick not found at $brickPath');
+        progress.fail('Template not found at $brickPath');
         return;
       }
 
@@ -30,6 +32,7 @@ class CleanGenerator {
         Directory(p.join(outputPath, featureName.snakeCase)),
       );
 
+      // We use await to ensure the progress shows until completion
       await generator.generate(
         target,
         vars: {'name': featureName},
@@ -37,8 +40,8 @@ class CleanGenerator {
 
       progress.complete('Successfully generated clean architecture folders for $featureName');
     } catch (e) {
-      progress.fail('Failed to generate folders: $e');
-      logger.err(e.toString());
+      progress.fail('Failed to generate: $e');
+      _logger.err(e.toString());
     }
   }
 }

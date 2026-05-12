@@ -1,5 +1,6 @@
 name: clean_feature
 description: A clean architecture feature brick.
+version: 0.1.0+1
 vars:
   name:
     type: string

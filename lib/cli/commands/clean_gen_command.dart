@@ -1,15 +1,16 @@
-import 'dart:io';
 import 'package:args/command_runner.dart';
+import 'package:clean_gen_cli/generator/clean_generator.dart';
 import 'package:mason/mason.dart';
-import 'package:path/path.dart' as p;
 
 class CleanGenCommand extends Command<void> {
+  final Logger _logger;
+  
   @override
   final String name = 'generate';
   @override
   final String description = 'Generates clean architecture folders.';
 
-  CleanGenCommand() {
+  CleanGenCommand({Logger? logger}) : _logger = logger ?? Logger() {
     argParser.addOption(
       'output',
       abbr: 'o',
@@ -21,37 +22,13 @@ class CleanGenCommand extends Command<void> {
   @override
   Future<void> run() async {
     if (argResults?.rest.isEmpty ?? true) {
-      print('Please provide a feature name.');
-      return;
+      usageException('Please provide a feature name.');
     }
 
     final featureName = argResults!.rest.first;
     final outputPath = argResults!['output'] as String;
 
-    final logger = Logger();
-    final progress = logger.progress('Generating clean architecture folders for $featureName');
-
-    try {
-      // For now, we use the local brick path. 
-      // In a real CLI package, you might want to bundle this or use a fixed location.
-      final brickPath = p.join(
-        Directory.current.path,
-        'lib/templates/clean_feature',
-      );
-
-      final generator = await MasonGenerator.fromBrick(Brick.path(brickPath));
-      final target = DirectoryGeneratorTarget(
-        Directory(p.join(outputPath, featureName.snakeCase)),
-      );
-
-      await generator.generate(
-        target,
-        vars: {'name': featureName},
-      );
-
-      progress.complete('Successfully generated clean architecture folders for $featureName');
-    } catch (e) {
-      progress.fail('Failed to generate folders: $e');
-    }
+    final generator = CleanGenerator(logger: _logger);
+    await generator.generate(featureName, outputPath);
   }
 }
