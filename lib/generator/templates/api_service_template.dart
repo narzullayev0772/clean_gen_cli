@@ -31,7 +31,7 @@ $requestMethods
 
   static String _generateUrlConstants(List<FunctionDef> functions) {
     final constants = functions.map((func) {
-      final constName = FileWriter.toConstName(func.name);
+      final constName = FileWriter.toSnakeCase(func.name);
       return "  static const String _$constName = '${func.api}';";
     }).join('\n');
 
@@ -40,7 +40,7 @@ $requestMethods
 
   static String _generateRequestMethods(List<FunctionDef> functions) {
     final methods = functions.map((func) {
-      final constName = FileWriter.toConstName(func.name);
+      final constName = FileWriter.toSnakeCase(func.name);
       final responseType = ModelGenerator.getResponseModelType(func);
       final requestType = ModelGenerator.getRequestModelType(func);
       final hasRequest = func.request != null;

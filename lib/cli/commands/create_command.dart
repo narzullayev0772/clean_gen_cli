@@ -131,7 +131,6 @@ class CreateCommand extends Command<void> {
         'data/data_sources',
         'data/models',
         'data/repositories',
-        'domain/entities',
         'domain/repositories',
         'domain/use_cases',
         'presentation/cubit',
@@ -143,6 +142,20 @@ class CreateCommand extends Command<void> {
       for (final folder in folders) {
         final folderPath = p.join(basePath, folder);
         Directory(folderPath).createSync(recursive: true);
+      }
+
+      // Create .gitkeep files
+      for (final folder in folders) {
+        if (hasFunctions) {
+          final folderName = p.basename(folder);
+          if (folderName == 'use_cases' ||
+              folderName == 'data_sources' ||
+              folderName == 'models') {
+            continue;
+          }
+        }
+        final gitkeepPath = p.join(basePath, folder, '.gitkeep');
+        await File(gitkeepPath).create(recursive: true);
       }
 
       progress.complete('Architecture initialized');

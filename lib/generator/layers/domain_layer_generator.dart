@@ -25,9 +25,6 @@ class DomainLayerGenerator {
       // Generate UseCases
       await _generateUseCases(domainPath, featureName, functions);
 
-      // Generate Entities (placeholder)
-      await _generateEntities(domainPath, featureName);
-
       logger.info('✓ Domain layer generated for $featureName');
     } catch (e) {
       logger.err('Failed to generate domain layer: $e');
@@ -70,29 +67,6 @@ class DomainLayerGenerator {
         content: content,
       );
     }
-  }
-
-  Future<void> _generateEntities(String domainPath, String featureName) async {
-    final entitiesPath = p.join(domainPath, 'entities');
-
-    final content = '''// Entities for $featureName feature
-// TODO: Define your business entities here
-
-// Example:
-// class User {
-//   final int id;
-//   final String name;
-//   final String email;
-// 
-//   const User({required this.id, required this.name, required this.email});
-// }
-''';
-
-    await FileWriter.createDartFile(
-      dirPath: entitiesPath,
-      fileName: '._placeholder',
-      content: content,
-    );
   }
 }
 
