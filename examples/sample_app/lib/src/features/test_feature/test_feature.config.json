@@ -1,0 +1,44 @@
+{
+  "name": "test_feature",
+  "note": "Types: string, int, double, bool, List<T>, or nested {}. Use '?' for nullable.",
+  "functions": [
+    {
+      "name": "signIn",
+      "api": "auth/sign",
+      "method": "post",
+      "paginate": false,
+      "req": {
+        "login": "string",
+        "password": "string"
+      },
+      "res": {
+        "token": "string",
+        "user": {
+          "id": "int",
+          "name": "string"
+        }
+      }
+    },
+    {
+      "name": "getCounts",
+      "api": "data/counts",
+      "method": "get",
+      "paginate": false,
+      "req": {},
+      "res": "List<int>"
+    },
+    {
+      "name": "listItems",
+      "api": "items/list",
+      "method": "get",
+      "paginate": true,
+      "req": {
+        "category": "string?"
+      },
+      "res": {
+        "items": "List<ItemModel>",
+        "total": "int"
+      }
+    }
+  ]
+}
