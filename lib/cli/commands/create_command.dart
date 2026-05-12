@@ -91,7 +91,7 @@ class CreateCommand extends Command<void> {
       } else {
         _logger.info(
           'No functions defined in config. Generated folder structure only.\n'
-          'To add API functions, edit .arch.json in $featureOutputPath',
+          'To add API functions, update your original config file and re-run the create command',
         );
       }
 
@@ -146,10 +146,7 @@ class CreateCommand extends Command<void> {
         Directory(folderPath).createSync(recursive: true);
       }
 
-      // Create .arch.json metadata file
-      await _createArchJsonMetadata(basePath, featureName);
-
-      // Create .gitkeep files
+   // Create .gitkeep files
       for (final folder in folders) {
         final gitkeepPath = p.join(basePath, folder, '.gitkeep');
         await File(gitkeepPath).create(recursive: true);
@@ -162,18 +159,10 @@ class CreateCommand extends Command<void> {
     }
   }
 
-  Future<void> _createArchJsonMetadata(String basePath, String featureName) async {
-    final metadata = {
-      'name': featureName,
-      'functions': <Map<String, dynamic>>[],
-    };
-
-    final archJsonPath = p.join(basePath, '.arch.json');
-    await File(archJsonPath).writeAsString(
-      const JsonEncoder.withIndent('  ').convert(metadata),
-      flush: true,
-    );
-  }
+  // Note: .arch.json generation was intentionally removed. The config file
+  // provided to the `create` command is the single source of truth for the
+  // feature (do not rely on a generated .arch.json). If you want to persist
+  // state inside the feature folder, add files manually after generation.
 
   Future<void> _generateFeatureFiles(String basePath, FeatureSchema schema) async {
     final progress = _logger.progress('Generating feature files...');
