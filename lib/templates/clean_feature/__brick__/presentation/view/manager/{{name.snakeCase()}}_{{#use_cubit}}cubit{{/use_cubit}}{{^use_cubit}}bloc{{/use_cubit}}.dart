@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/use_cases/fetch_{{name.snakeCase()}}_use_case.dart';
 

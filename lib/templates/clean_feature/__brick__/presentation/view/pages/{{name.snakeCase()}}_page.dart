@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 import 'package:flutter/material.dart';
 
 class {{name.pascalCase()}}Page extends StatelessWidget {

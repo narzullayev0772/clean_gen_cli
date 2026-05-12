@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 import "../../../../../core/locator.dart";
 import "data/data_sources/{{name.snakeCase()}}_api_service.dart";
 import "data/repositories/{{name.snakeCase()}}_repository_impl.dart";

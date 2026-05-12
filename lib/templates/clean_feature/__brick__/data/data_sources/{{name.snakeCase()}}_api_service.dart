@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 class {{name.pascalCase()}}ApiService {
   final dynamic _client;
 

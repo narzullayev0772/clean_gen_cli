@@ -1,3 +1,5 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 import 'package:core/core.dart';
 import '../../domain/repositories/{{name.snakeCase()}}_repository.dart';
 import '../data_sources/{{name.snakeCase()}}_api_service.dart';
