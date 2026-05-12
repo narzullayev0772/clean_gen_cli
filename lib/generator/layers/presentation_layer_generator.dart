@@ -20,12 +20,6 @@ class PresentationLayerGenerator {
       // Generate Cubit
       await _generateCubit(presentationPath, featureName, functions);
 
-      // Generate Pages (placeholder)
-      await _generatePages(presentationPath, featureName);
-
-      // Generate Widgets (placeholder)
-      await _generateWidgets(presentationPath, featureName);
-
       logger.info('✓ Presentation layer generated for $featureName');
     } catch (e) {
       logger.err('Failed to generate presentation layer: $e');
@@ -55,65 +49,6 @@ class PresentationLayerGenerator {
       dirPath: managerPath,
       fileName: '${snakeName}_state.dart',
       content: stateContent,
-    );
-  }
-
-  Future<void> _generatePages(String presentationPath, String featureName) async {
-    final pagesPath = p.join(presentationPath, 'pages');
-    final snakeName = FileWriter.toSnakeCase(featureName);
-
-
-    final content = '''import 'package:flutter/material.dart';
-
-class ${FileWriter.toCamelCase(snakeName)}Screen extends StatefulWidget {
-  const ${FileWriter.toCamelCase(snakeName)}Screen({Key? key}) : super(key: key);
-
-  @override
-  State<${FileWriter.toCamelCase(snakeName)}Screen> createState() => _${FileWriter.toCamelCase(snakeName)}ScreenState();
-}
-
-class _${FileWriter.toCamelCase(snakeName)}ScreenState extends State<${FileWriter.toCamelCase(snakeName)}Screen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('${FileWriter.toCamelCase(snakeName)}')),
-      body: const Center(child: Text('TODO: Implement UI')),
-    );
-  }
-}
-''';
-
-    await FileWriter.createDartFile(
-      dirPath: pagesPath,
-      fileName: '${snakeName}_screen.dart',
-      content: content,
-    );
-  }
-
-  Future<void> _generateWidgets(String presentationPath, String featureName) async {
-    final widgetsPath = p.join(presentationPath, 'widgets');
-    final snakeName = FileWriter.toSnakeCase(featureName);
-
-    final content = '''import 'package:flutter/material.dart';
-
-// TODO: Add your custom widgets here
-// Example:
-// class ${FileWriter.toCamelCase(snakeName)}Widget extends StatelessWidget {
-//   const ${FileWriter.toCamelCase(snakeName)}Widget({Key? key}) : super(key: key);
-// 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       child: Text('Your widget here'),
-//     );
-//   }
-// }
-''';
-
-    await FileWriter.createDartFile(
-      dirPath: widgetsPath,
-      fileName: '._placeholder',
-      content: content,
     );
   }
 }

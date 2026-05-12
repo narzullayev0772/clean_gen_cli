@@ -146,18 +146,22 @@ class CreateCommand extends Command<void> {
 
       // Create .gitkeep files
       for (final folder in folders) {
+        bool shouldSkipGitkeep = false;
         if (hasFunctions) {
           final folderName = p.basename(folder);
           if (folderName == 'use_cases' ||
               folderName == 'data_sources' ||
-              folderName == 'models') {
-            continue;
+              folderName == 'models' ||
+              folderName == 'repositories' ||
+              folderName == 'cubit') {
+            shouldSkipGitkeep = true;
           }
-        }else{
+        }
+
+        if (!shouldSkipGitkeep) {
           final gitkeepPath = p.join(basePath, folder, '.gitkeep');
           await File(gitkeepPath).create(recursive: true);
         }
-
       }
 
       progress.complete('Architecture initialized');
