@@ -1,0 +1,37 @@
+{
+  "name": "auth", // feature name here, required
+  "functions": [
+    {
+      "name": "signIn", // function name here, required
+      "api": "/auth/sign-in", // api path here, required
+      "method": "POST", // method here, default is GET, optional
+      "request": { // request body here, optional default dynamic
+        "email": "string",
+        "password": "string"
+      },
+      "response": { // response body here, optional default dynamic
+        "token": "string",
+        "user": {
+          "name": "string",
+          "email": "string"
+        }
+      }
+    },
+    {
+      "name": "getUsers",
+      "api": "/users",
+      "pagination": true, // if the api has pagination, optional default false
+      "request": {
+        "page": 1,
+        //...
+      },
+      "response": [
+        {
+          "id": 1,
+          "name": "string",
+          "email": "string"
+        }
+      ]
+    }
+  ]
+}
