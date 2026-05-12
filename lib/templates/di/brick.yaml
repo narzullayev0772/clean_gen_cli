@@ -1,7 +1,0 @@
-name: di
-description: A clean architecture DI registration template.
-version: 0.1.0+1
-vars:
-  name:
-    type: string
-    description: The name of the feature
