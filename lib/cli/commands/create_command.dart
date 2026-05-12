@@ -153,9 +153,11 @@ class CreateCommand extends Command<void> {
               folderName == 'models') {
             continue;
           }
+        }else{
+          final gitkeepPath = p.join(basePath, folder, '.gitkeep');
+          await File(gitkeepPath).create(recursive: true);
         }
-        final gitkeepPath = p.join(basePath, folder, '.gitkeep');
-        await File(gitkeepPath).create(recursive: true);
+
       }
 
       progress.complete('Architecture initialized');
