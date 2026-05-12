@@ -8,7 +8,7 @@ class CleanGenerator extends BaseGenerator {
   /// Generates the complete feature structure and files based on uyqur_app style.
   Future<void> generateFullFeature(String featureName, String outputPath, {bool useCubit = true}) async {
     await generate(
-      brickName: 'clean_feature',
+      brickName: 'clean_v1',
       vars: {'name': featureName, 'use_cubit': useCubit},
       targetDirectory: p.join(outputPath, featureName.snakeCase),
     );
