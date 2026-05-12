@@ -137,8 +137,6 @@ class CubitStateTemplate {
 
     return '''part of '${FileWriter.toSnakeCase(featureName)}_cubit.dart';
 
-$modelImports
-
 class $stateName {
 $fields
 

@@ -129,6 +129,13 @@ class FeatureGenerator {
       return;
     }
 
+    final pubspecFile = File(p.join(projectRoot, 'pubspec.yaml'));
+    final pubspecContent = await pubspecFile.readAsString();
+    if (!pubspecContent.contains('build_runner')) {
+      logger.warn('build_runner not found in pubspec.yaml. Skipping generation.');
+      return;
+    }
+
     final progress = logger.progress('Running build_runner...');
     try {
       final result = await Process.run(
