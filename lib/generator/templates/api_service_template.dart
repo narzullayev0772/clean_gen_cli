@@ -1,5 +1,6 @@
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
+import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 
 class ApiServiceTemplate {
   static String generate(String featureName, List<FunctionDef> functions) {
@@ -40,18 +41,25 @@ $requestMethods
   static String _generateRequestMethods(List<FunctionDef> functions) {
     final methods = functions.map((func) {
       final constName = FileWriter.toConstName(func.name);
-      final returnType = 'BaseResponse<dynamic>';
+      final responseType = ModelGenerator.getResponseModelType(func);
+      final requestType = ModelGenerator.getRequestModelType(func);
+      final hasRequest = func.request != null;
 
       if (func.method == 'GET') {
         return '''  @GET(_$constName)
-  Future<HttpResponse<$returnType>> ${func.name}();''';
+  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}();''';
+      } else if (hasRequest) {
+        return '''  @${func.method}(_$constName)
+  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}(@Body() $requestType request);''';
       } else {
         return '''  @${func.method}(_$constName)
-  Future<HttpResponse<$returnType>> ${func.name}();''';
+  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}();''';
       }
     }).join('\n\n  ');
 
     return methods;
   }
 }
+
+
 

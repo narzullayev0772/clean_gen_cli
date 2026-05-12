@@ -3,6 +3,7 @@ import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/templates/api_service_template.dart';
 import 'package:clean_gen_cli/generator/templates/repository_template.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
+import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 import 'package:mason/mason.dart';
 
 class DataLayerGenerator {
@@ -53,14 +54,19 @@ class DataLayerGenerator {
   }
 
   Future<void> _generateModels(String dataPath, String featureName) async {
-    // Create models directory with placeholder README
+    // Create models directory with index file
     final modelsPath = p.join(dataPath, 'models');
 
-    // Create directory by attempting to create README
+    // Create index file for models
     await FileWriter.createDartFile(
       dirPath: modelsPath,
-      fileName: '._placeholder',
-      content: '// Models go here',
+      fileName: 'index.dart',
+      content: '''// Export all models
+// Add your model exports here
+// Example:
+// export 'user_model.dart';
+// export 'product_model.dart';
+''',
     );
   }
 
@@ -69,24 +75,35 @@ class DataLayerGenerator {
     String featureName,
     List<FunctionDef> functions,
   ) async {
-    // Create bodies directory with placeholder
     final bodiesPath = p.join(dataPath, 'bodies');
 
+    // Generate request and response models for each function
     for (final function in functions) {
-      final fileName = '${FileWriter.toSnakeCase(function.name)}_body.dart';
-      final content = '''// Request/Response body for ${function.name}
-// Generated from .arch.json schema
+      // Generate request model
+      if (function.request != null) {
+        final requestModel = ModelGenerator.generateRequestModel(function);
+        if (requestModel.isNotEmpty) {
+          final fileName = '${FileWriter.toSnakeCase(function.name)}_request.dart';
+          await FileWriter.createDartFile(
+            dirPath: bodiesPath,
+            fileName: fileName,
+            content: requestModel,
+          );
+        }
+      }
 
-class ${FileWriter.toCamelCase(function.name)}Body {
-  // TODO: Define request/response fields
-}
-''';
-
-      await FileWriter.createDartFile(
-        dirPath: bodiesPath,
-        fileName: fileName,
-        content: content,
-      );
+      // Generate response model
+      if (function.response != null) {
+        final responseModel = ModelGenerator.generateResponseModel(function);
+        if (responseModel.isNotEmpty) {
+          final fileName = '${FileWriter.toSnakeCase(function.name)}_model.dart';
+          await FileWriter.createDartFile(
+            dirPath: bodiesPath,
+            fileName: fileName,
+            content: responseModel,
+          );
+        }
+      }
     }
   }
 
