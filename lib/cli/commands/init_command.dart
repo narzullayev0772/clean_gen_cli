@@ -32,12 +32,17 @@ class InitCommand extends Command<void> {
       }
 
       final defaultConfig = {
+        '\$schema': '../clean_gen_global_schema.json',
         'imports': {
-          'core': 'package:core/core.dart',
-          'fetcher': 'package:core/utils/fetcher.dart'
+          'data_state': 'package:core/core.dart',
+          'use_case': 'package:core/core.dart',
+          'base_repository': 'package:core/core.dart',
+          'base_response': 'package:core/resources/base_response.dart',
+          'locator': 'package:core/di/locator.dart'
         },
         'config': {
-          'base_url': 'https://api.example.com'
+          'fetcher_import': '../../../../core/utils/fetcher.dart',
+          'locator_name': 'locator'
         }
       };
 

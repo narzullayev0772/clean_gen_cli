@@ -13,7 +13,15 @@ class UseCaseTemplate {
     final returnType = responseType == 'dynamic' ? 'dynamic' : '$responseType?';
     final modelImports = _generateModelImports(function, '../../data/models');
 
+    final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
+    final dataStateImportLine = dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
+    
+    final useCaseImport = schema.globalConfig.imports['use_case'] ?? '';
+    final useCaseImportLine = useCaseImport.isNotEmpty ? "import '$useCaseImport';" : "";
+
     return '''import '../repositories/${FileWriter.toSnakeCase(featureName)}_repository.dart';
+$dataStateImportLine
+$useCaseImportLine
 $modelImports
 
 class $className implements UseCase<DataState<$returnType>, $requestType> {

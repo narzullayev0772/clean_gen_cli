@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Clean Gen Global Config Schema",
+  "type": "object",
+  "properties": {
+    "imports": {
+      "type": "object",
+      "properties": {
+        "data_state": { "type": "string", "description": "Import for DataState class." },
+        "use_case": { "type": "string", "description": "Import for UseCase base class." },
+        "base_repository": { "type": "string", "description": "Import for BaseRepository mixin." },
+        "base_response": { "type": "string", "description": "Import for BaseResponse class." },
+        "locator": { "type": "string", "description": "Import for the service locator (e.g. get_it)." }
+      },
+      "additionalProperties": { "type": "string" }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "fetcher_import": { "type": "string", "description": "Relative or package path to the Fetcher utility." },
+        "locator_name": { "type": "string", "description": "The name of the service locator instance (default: locator)." }
+      },
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

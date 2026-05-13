@@ -14,6 +14,20 @@
       "type": "string",
       "description": "The name of the feature (e.g., auth, profile)."
     },
+    "imports": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Feature-specific imports that override global imports."
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Feature-specific configuration that overrides global config."
+    },
     "functions": {
       "type": "array",
       "items": {
@@ -65,14 +79,7 @@
               "array",
               "string"
             ],
-            "description": "Example response payload or magic model reference (e.g., $MyModel).",
-            "items": {
-              "type": [
-                "object",
-                "array",
-                "string"
-              ]
-            }
+            "description": "Example response payload or magic model reference (e.g., $MyModel)."
           }
         }
       }

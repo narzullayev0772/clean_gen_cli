@@ -16,8 +16,10 @@ class RepositoryTemplate {
     }).join('\n');
 
     final modelImports = _generateModelImports(schema.functions, '../../data/models');
+    final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
+    final dataStateImportLine = dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
 
-    return '''
+    return '''$dataStateImportLine
 $modelImports
 
 abstract class $className {
@@ -50,9 +52,17 @@ class RepositoryImplTemplate {
     }).join('\n');
 
     final modelImports = _generateModelImports(schema.functions, '../models');
+    
+    final baseRepoImport = schema.globalConfig.imports['base_repository'] ?? '';
+    final baseRepoImportLine = baseRepoImport.isNotEmpty ? "import '$baseRepoImport';" : "";
+    
+    final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
+    final dataStateImportLine = dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
 
     return '''import '../data_sources/${snakeName}_api_service.dart';
 import '../../domain/repositories/${snakeName}_repository.dart';
+$dataStateImportLine
+$baseRepoImportLine
 $modelImports
 
 class $implClassName with BaseRepository implements $className {
