@@ -24,8 +24,21 @@ class CubitTemplate {
 
     final fetcherImport = schema.globalConfig.config['fetcher_import'] ?? '../../../../core/utils/fetcher.dart';
 
+    // Conditional resource imports: only import the needed base state files
+    final needsBaseState = functions.any((f) => !f.pagination);
+    final needsBasePagination = functions.any((f) => f.pagination);
+    final resourceImportsList = <String>[];
+    if (needsBaseState) {
+      resourceImportsList.add("import 'package:core/resources/base_state.dart';");
+    }
+    if (needsBasePagination) {
+      resourceImportsList.add("import 'package:core/resources/base_pagination_state.dart';");
+    }
+    final resourceImports = resourceImportsList.join('\n');
+
     return '''import 'package:bloc/bloc.dart';
 import '$fetcherImport';
+$resourceImports
 $useCaseImports
 $modelImports
 
@@ -110,8 +123,6 @@ class CubitStateTemplate {
     final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
     final stateName = '${camelName}State';
 
-    final modelImports = CubitTemplate._generateModelImports(functions, '../../data/models');
-
     final fields = functions.map((f) {
       final responseType = ModelGenerator.getResponseModelType(f);
       final baseResponseType = ModelGenerator.getBaseResponseModelType(f);
@@ -146,7 +157,6 @@ class CubitStateTemplate {
 
     return '''part of '${FileWriter.toSnakeCase(featureName)}_cubit.dart';
 
-$modelImports
 
 class $stateName {
 $fields
