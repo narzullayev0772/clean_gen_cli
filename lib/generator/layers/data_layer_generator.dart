@@ -1,10 +1,10 @@
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/templates/api_service_template.dart';
 import 'package:clean_gen_cli/generator/templates/repository_template.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 import 'package:clean_gen_cli/generator/utils/model_generator.dart';
-import 'package:mason/mason.dart';
 
 class DataLayerGenerator {
   final Logger logger;

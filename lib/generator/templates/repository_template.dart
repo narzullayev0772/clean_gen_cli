@@ -69,10 +69,10 @@ $methods
 String _generateModelImports(List<FunctionDef> functions, String relativePath) {
   final imports = <String>{};
   for (final f in functions) {
-    if (f.request != null) {
+    if (f.request != null && !ModelGenerator.isMagic(f.request)) {
       imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
     }
-    if (f.response != null) {
+    if (f.response != null && !ModelGenerator.isMagic(f.response)) {
       imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
     }
   }

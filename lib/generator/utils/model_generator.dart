@@ -2,9 +2,9 @@ import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 
 class ModelGenerator {
-  static bool _isMagic(dynamic value) {
+  static bool isMagic(dynamic value) {
     if (value is String && value.startsWith('\$')) return true;
-    if (value is List && value.isNotEmpty && _isMagic(value.first)) return true;
+    if (value is List && value.isNotEmpty && isMagic(value.first)) return true;
     return false;
   }
 
@@ -16,7 +16,7 @@ class ModelGenerator {
 
   /// Generate request model class from schema
   static String generateRequestModel(FunctionDef function, {String strategy = 'empty'}) {
-    if (function.request == null || _isMagic(function.request)) {
+    if (function.request == null || isMagic(function.request)) {
       return '';
     }
 
@@ -28,7 +28,7 @@ class ModelGenerator {
 
   /// Generate response model class from schema
   static String generateResponseModel(FunctionDef function, {String strategy = 'empty'}) {
-    if (function.response == null || _isMagic(function.response)) {
+    if (function.response == null || isMagic(function.response)) {
       return '';
     }
 
@@ -159,7 +159,7 @@ ${fields.join('\n')}
     if (function.request == null) {
       return 'dynamic';
     }
-    if (_isMagic(function.request)) {
+    if (isMagic(function.request)) {
       return _getMagicName(function.request);
     }
     return '${FileWriter.toCamelCase(function.name)}RequestBody';
@@ -171,7 +171,7 @@ ${fields.join('\n')}
       return 'dynamic';
     }
 
-    if (_isMagic(function.response)) {
+    if (isMagic(function.response)) {
       final name = _getMagicName(function.response);
       if (function.response is List || function.pagination) {
         return 'List<$name>';
@@ -193,7 +193,7 @@ ${fields.join('\n')}
     if (function.response == null) {
       return 'dynamic';
     }
-    if (_isMagic(function.response)) {
+    if (isMagic(function.response)) {
       return _getMagicName(function.response);
     }
     return '${FileWriter.toCamelCase(function.name)}Model';

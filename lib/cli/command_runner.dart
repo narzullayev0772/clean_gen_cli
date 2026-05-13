@@ -1,6 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:clean_gen_cli/cli/commands/create_command.dart';
-import 'package:mason/mason.dart';
+import 'package:mason_logger/mason_logger.dart';
 
 class CleanGenCommandRunner extends CommandRunner<void> {
   final Logger _logger;

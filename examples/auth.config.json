@@ -12,17 +12,13 @@
       },
       "response": {
         "token": "string",
-        "user": {
-          "id": 1,
-          "email": "string",
-          "name": "string"
-        }
+        "user": "$UserModel"
       }
     },
     {
       "name": "signUp",
       "api": "/api/auth/sign-up",
-      "method": "GET",
+      "method": "POST",
       "request": {
         "email": "string",
         "password": "string",
@@ -42,17 +38,10 @@
       "api": "/users/list",
       "pagination": true,
       "query": true,
+      "request": "$PaginationQueryModel",
       "response": [
-        {
-          "id": 1,
-          "email": "string",
-          "name": "string"
-        }
-      ],
-      "request": {
-        "page": 1,
-        "pageSize": 10
-      }
+        "$UserModel"
+      ]
     }
   ]
 }

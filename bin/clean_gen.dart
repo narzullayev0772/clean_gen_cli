@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:clean_gen_cli/cli/command_runner.dart';
-import 'package:mason/mason.dart';
+import 'package:mason_logger/mason_logger.dart';
 
 void main(List<String> arguments) async {
   final logger = Logger();

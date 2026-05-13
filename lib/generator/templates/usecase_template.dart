@@ -29,11 +29,13 @@ class $className implements UseCase<DataState<$returnType>, $requestType> {
 
   static String _generateModelImports(FunctionDef function, String relativePath) {
     final imports = <String>{};
-    if (function.request != null) {
-      imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(function.name)}_request.dart';");
+    if (function.request != null && !ModelGenerator.isMagic(function.request)) {
+      imports.add(
+          "import '$relativePath/requests/${FileWriter.toSnakeCase(function.name)}_request.dart';");
     }
-    if (function.response != null) {
-      imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';");
+    if (function.response != null && !ModelGenerator.isMagic(function.response)) {
+      imports.add(
+          "import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';");
     }
     final sortedImports = imports.toList()..sort();
     return sortedImports.join('\n');

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:clean_gen_cli/generator/layers/data_layer_generator.dart';
 import 'package:clean_gen_cli/generator/layers/domain_layer_generator.dart';
@@ -6,7 +7,6 @@ import 'package:clean_gen_cli/generator/layers/presentation_layer_generator.dart
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/templates/di_template.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
-import 'package:mason/mason.dart';
 
 /// Main orchestrator for feature generation
 /// Coordinates the generation of all layers and files

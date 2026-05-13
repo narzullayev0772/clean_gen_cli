@@ -54,16 +54,25 @@
           "request": {
             "type": [
               "object",
-              "array"
+              "array",
+              "string"
             ],
-            "description": "Example request payload for model generation."
+            "description": "Example request payload or magic model reference (e.g., $MyModel)."
           },
           "response": {
             "type": [
               "object",
-              "array"
+              "array",
+              "string"
             ],
-            "description": "Example response payload for model generation."
+            "description": "Example response payload or magic model reference (e.g., $MyModel).",
+            "items": {
+              "type": [
+                "object",
+                "array",
+                "string"
+              ]
+            }
           }
         }
       }

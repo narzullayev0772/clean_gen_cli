@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:clean_gen_cli/generator/feature_generator.dart';
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
-import 'package:mason/mason.dart';
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 

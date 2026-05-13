@@ -1,8 +1,8 @@
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/templates/cubit_template.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
-import 'package:mason/mason.dart';
 
 class PresentationLayerGenerator {
   final Logger logger;
