@@ -192,18 +192,36 @@ ${fields.join('\n')}
   }
 
   static String _getDartType(dynamic value) {
+    // Null values -> dynamic
+    if (value == null) return 'dynamic';
+
+    // String values (or magic model references like $UserModel)
     if (value is String) {
       if (value.startsWith('\$')) return value.substring(1);
       return 'String';
     }
-    if (value is int) return 'int';
-    if (value is double) return 'double';
+
+    // Numbers: int and double both map to num (more flexible for JSON)
+    if (value is int || value is double) return 'num';
+
+    // Boolean
     if (value is bool) return 'bool';
+
+    // Lists: recursive type detection for inner elements
     if (value is List) {
       if (value.isEmpty) return 'List<dynamic>';
+      // Infer from first element
       return 'List<${_getDartType(value.first)}>';
     }
-    if (value is Map) return 'Map<String, dynamic>';
+
+    // Maps / nested objects
+    if (value is Map) {
+      // For now, treat as Map<String, dynamic>
+      // In future could detect homogeneous maps and infer value types
+      return 'Map<String, dynamic>';
+    }
+
+    // Fallback for unknown types
     return 'dynamic';
   }
 
