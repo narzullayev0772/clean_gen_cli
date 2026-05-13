@@ -15,6 +15,7 @@ class DataLayerGenerator {
     required String basePath,
     required String featureName,
     required List<FunctionDef> functions,
+    String modelStrategy = 'empty',
   }) async {
     try {
       final dataPath = p.join(basePath, 'data');
@@ -23,7 +24,7 @@ class DataLayerGenerator {
       await _generateApiService(dataPath, featureName, functions);
 
       // Generate Models
-      await _generateModels(dataPath, featureName, functions);
+      await _generateModels(dataPath, featureName, functions, modelStrategy);
 
       // Generate Repository
       await _generateRepository(dataPath, featureName, functions);
@@ -54,6 +55,7 @@ class DataLayerGenerator {
     String dataPath,
     String featureName,
     List<FunctionDef> functions,
+    String modelStrategy,
   ) async {
     final requestsPath = p.join(dataPath, 'models', 'requests');
     final responsesPath = p.join(dataPath, 'models', 'responses');
@@ -62,7 +64,7 @@ class DataLayerGenerator {
     for (final function in functions) {
       // Generate request model
       if (function.request != null) {
-        final requestModel = ModelGenerator.generateRequestModel(function);
+        final requestModel = ModelGenerator.generateRequestModel(function, strategy: modelStrategy);
         if (requestModel.isNotEmpty) {
           final fileName = '${FileWriter.toSnakeCase(function.name)}_request.dart';
           await FileWriter.createDartFile(
@@ -75,7 +77,7 @@ class DataLayerGenerator {
 
       // Generate response model
       if (function.response != null) {
-        final responseModel = ModelGenerator.generateResponseModel(function);
+        final responseModel = ModelGenerator.generateResponseModel(function, strategy: modelStrategy);
         if (responseModel.isNotEmpty) {
           final fileName = '${FileWriter.toSnakeCase(function.name)}_model.dart';
           await FileWriter.createDartFile(

@@ -3,59 +3,140 @@ import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 
 class ModelGenerator {
   /// Generate request model class from schema
-  static String generateRequestModel(FunctionDef function) {
+  static String generateRequestModel(FunctionDef function, {String strategy = 'empty'}) {
     if (function.request == null) {
-      return ''; // No request model needed
+      return '';
     }
 
     final modelName = '${FileWriter.toCamelCase(function.name)}RequestBody';
-    final jsonSchema = _formatJsonComment(function.request);
+    final fileName = '${FileWriter.toSnakeCase(function.name)}_request';
 
-    return '''// Generated from .arch.json
+    return _generateModel(modelName, fileName, function.request, strategy);
+  }
+
+  /// Generate response model class from schema
+  static String generateResponseModel(FunctionDef function, {String strategy = 'empty'}) {
+    if (function.response == null) {
+      return '';
+    }
+
+    dynamic responseData = function.response;
+    if (responseData is List && responseData.isNotEmpty) {
+      responseData = responseData.first;
+    }
+
+    final modelName = '${FileWriter.toCamelCase(function.name)}Model';
+    final fileName = '${FileWriter.toSnakeCase(function.name)}_model';
+
+    return _generateModel(modelName, fileName, responseData, strategy);
+  }
+
+  static String _generateModel(String className, String fileName, dynamic data, String strategy) {
+    if (strategy == 'serialize') {
+      return _generateSerializableModel(className, fileName, data);
+    } else if (strategy == 'generate') {
+      return _generatePlainModel(className, data);
+    } else {
+      return _generateEmptyModel(className, data);
+    }
+  }
+
+  static String _generateEmptyModel(String className, dynamic data) {
+    final jsonSchema = _formatJsonComment(data);
+    return '''// Generated from config
 $jsonSchema
-class $modelName {
-  // TODO: Define request fields
-  // Example:
-  // final String email;
-  // final String password;
+class $className {
+  // TODO: Define fields
   //
-  // const $modelName({
-  //   required this.email,
-  //   required this.password,
-  // });
+  // const $className();
 }
 ''';
   }
 
-  /// Generate response model class from schema
-  static String generateResponseModel(FunctionDef function) {
-    if (function.response == null) {
-      return ''; // No response model needed
-    }
+  static String _generatePlainModel(String className, dynamic data) {
+    if (data is! Map) return _generateEmptyModel(className, data);
 
-    final isListResponse = function.response is List;
-    final modelName = isListResponse
-        ? '${FileWriter.toCamelCase(function.name)}Model'
-        : '${FileWriter.toCamelCase(function.name)}Model';
+    final fields = <String>[];
+    final constructorParams = <String>[];
+    final fromJsonLines = <String>[];
+    final toJsonLines = <String>[];
 
-    final jsonSchema = _formatJsonComment(function.response);
+    data.forEach((key, value) {
+      final dartKey = FileWriter.toLowerCamelCase(key.toString());
+      final type = _getDartType(value);
 
-    return '''// Generated from .arch.json
-$jsonSchema
-class $modelName {
-  // TODO: Define response fields
-  // Example:
-  // final int id;
-  // final String name;
-  // final String email;
-  //
-  // const $modelName({
-  //   required this.id,
-  //   required this.name,
-  //   required this.email,
-  // });
+      fields.add('  final $type? $dartKey;');
+      constructorParams.add('this.$dartKey');
+      fromJsonLines.add("      $dartKey: json['$key'] as $type?,");
+      toJsonLines.add("      '$key': $dartKey,");
+    });
+
+    return '''class $className {
+${fields.join('\n')}
+
+  const $className({
+    ${constructorParams.join(',\n    ')},
+  });
+
+  factory $className.fromJson(Map<String, dynamic> json) {
+    return $className(
+${fromJsonLines.join('\n')}
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+${toJsonLines.join('\n')}
+    };
+  }
 }
 ''';
+  }
+
+  static String _generateSerializableModel(String className, String fileName, dynamic data) {
+    if (data is! Map) return _generateEmptyModel(className, data);
+
+    final fields = <String>[];
+    final constructorParams = <String>[];
+
+    data.forEach((key, value) {
+      final dartKey = FileWriter.toLowerCamelCase(key.toString());
+      final type = _getDartType(value);
+
+      fields.add('  final $type? $dartKey;');
+      constructorParams.add('this.$dartKey');
+    });
+
+    return '''import 'package:json_annotation/json_annotation.dart';
+
+part '$fileName.g.dart';
+
+@JsonSerializable()
+class $className {
+${fields.join('\n')}
+
+  const $className({
+    ${constructorParams.join(',\n    ')},
+  });
+
+  factory $className.fromJson(Map<String, dynamic> json) => _\$${className}FromJson(json);
+
+  Map<String, dynamic> toJson() => _\$${className}ToJson(this);
+}
+''';
+  }
+
+  static String _getDartType(dynamic value) {
+    if (value is int) return 'int';
+    if (value is double) return 'double';
+    if (value is bool) return 'bool';
+    if (value is String) return 'String';
+    if (value is List) {
+      if (value.isEmpty) return 'List<dynamic>';
+      return 'List<${_getDartType(value.first)}>';
+    }
+    if (value is Map) return 'Map<String, dynamic>';
+    return 'dynamic';
   }
 
   /// Get request model type name
@@ -98,7 +179,7 @@ class $modelName {
       final lines = jsonStr.split('\n').map((line) => '// $line').join('\n');
       return '/*\n$lines\n*/\n';
     } catch (e) {
-      return '// Schema available in .arch.json\n';
+      return '// Schema available in config\n';
     }
   }
 
@@ -128,4 +209,3 @@ class $modelName {
     }
   }
 }
-

@@ -24,6 +24,13 @@ class CreateCommand extends Command<void> {
       defaultsTo: 'lib/src/features',
       help: 'Output path for the generated feature.',
     );
+    argParser.addOption(
+      'model',
+      abbr: 'm',
+      defaultsTo: 'empty',
+      allowed: ['empty', 'serialize', 'generate'],
+      help: 'Model generation strategy.',
+    );
   }
 
   @override
@@ -34,7 +41,8 @@ class CreateCommand extends Command<void> {
       usageException(
         'Please provide a config file path\n'
         'Example: clean_gen create config/auth.config.json\n'
-        'Example: clean_gen create config/auth.config.json --output lib/features',
+        'Example: clean_gen create config/auth.config.json --output lib/features\n'
+        'Example: clean_gen create config/auth.config.json --model generate',
       );
     }
 
@@ -98,7 +106,8 @@ class CreateCommand extends Command<void> {
 
       // If functions exist, generate all files
       if (schema.functions.isNotEmpty) {
-        await _generateFeatureFiles(featureOutputPath, schema);
+        final modelStrategy = argResults!['model'] as String;
+        await _generateFeatureFiles(featureOutputPath, schema, modelStrategy);
       } else {
         _logger.info(
           'No functions defined in config. Generated folder structure only.\n'
@@ -207,12 +216,12 @@ class CreateCommand extends Command<void> {
   // feature (do not rely on a generated .arch.json). If you want to persist
   // state inside the feature folder, add files manually after generation.
 
-  Future<void> _generateFeatureFiles(String basePath, FeatureSchema schema) async {
+  Future<void> _generateFeatureFiles(String basePath, FeatureSchema schema, String modelStrategy) async {
     final progress = _logger.progress('Generating feature files...');
 
     try {
       final generator = FeatureGenerator(logger: _logger);
-      await generator.generate(basePath: basePath, schema: schema);
+      await generator.generate(basePath: basePath, schema: schema, modelStrategy: modelStrategy);
       progress.complete('Feature files generated');
     } catch (e) {
       progress.fail('Failed to generate files: $e');

@@ -26,6 +26,7 @@ class FeatureGenerator {
   Future<void> generate({
     required String basePath,
     required FeatureSchema schema,
+    String modelStrategy = 'empty',
   }) async {
     final timer = Stopwatch()..start();
 
@@ -40,6 +41,7 @@ class FeatureGenerator {
         basePath: basePath,
         featureName: schema.name,
         functions: schema.functions,
+        modelStrategy: modelStrategy,
       );
 
       await _domainLayer.generate(
