@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Generated executable wrapper for clean_gen_cli
+dart run clean_gen_cli:clean_gen "$@"
+
