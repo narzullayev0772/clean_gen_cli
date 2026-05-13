@@ -48,9 +48,9 @@ $requestMethods
 
       String params = '';
       if (hasRequest) {
-        // Default to true for body if not specified, unless it's a GET request
-        final useBody = func.body ?? (func.method != 'GET');
-        final annotation = useBody ? '@Body()' : '@Queries()';
+        // Default value is false (Body)
+        final useQuery = func.query ?? false;
+        final annotation = useQuery ? '@Queries()' : '@Body()';
         params = '$annotation $requestType request';
       }
 

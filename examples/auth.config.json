@@ -37,7 +37,8 @@
       "request": {
         "page": 1,
         "pageSize": 10
-      }
+      },
+      "body": false
     }
   ]
 }

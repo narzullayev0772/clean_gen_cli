@@ -26,7 +26,7 @@ class FunctionDef {
   final dynamic request; // Can be Map or List
   final dynamic response; // Can be Map or List
   final bool pagination;
-  final bool? body;
+  final bool? query;
 
   FunctionDef({
     required this.name,
@@ -35,7 +35,7 @@ class FunctionDef {
     this.request,
     this.response,
     this.pagination = false,
-    this.body,
+    this.query,
   });
 
   factory FunctionDef.fromJson(Map<String, dynamic> json) {
@@ -46,7 +46,7 @@ class FunctionDef {
       request: json['request'], // Accept both Map and List
       response: json['response'], // Accept both Map and List
       pagination: (json['pagination'] as bool?) ?? false,
-      body: json['body'] as bool?,
+      query: json['query'] as bool?,
     );
   }
 
