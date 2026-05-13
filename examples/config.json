@@ -1,0 +1,14 @@
+{
+  "$schema": "../clean_gen_global_schema.json",
+  "imports": {
+    "data_state": "package:core/core.dart",
+    "use_case": "package:core/core.dart",
+    "base_repository": "package:core/core.dart",
+    "base_response": "package:core/resources/base_response.dart",
+    "locator": "package:uyqur_app/src/core/di/locator.dart"
+  },
+  "config": {
+    "fetcher_import": "package:uyqur_app/src/core/utils/fetcher.dart",
+    "locator_name": "locator"
+  }
+}
