@@ -2,17 +2,17 @@ import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 
 class DITemplate {
-  static String generate(String featureName, List<FunctionDef> functions) {
-    final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
-    final snakeName = FileWriter.toSnakeCase(featureName);
-    final functionName = '${snakeName}DI';
+  static String generate(FeatureSchema schema) {
+    final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(schema.name));
+    final snakeName = FileWriter.toSnakeCase(schema.name);
+    final functionName = '${FileWriter.toLowerCamelCase(schema.name)}DI';
 
     final apiServiceRegistration = _generateApiServiceRegistration(camelName);
     final repositoryRegistration = _generateRepositoryRegistration(camelName);
-    final useCaseRegistrations = _generateUseCaseRegistrations(functions, camelName);
-    final cubitsRegistration = _generateCubitsRegistration(functions, camelName);
+    final useCaseRegistrations = _generateUseCaseRegistrations(schema.functions, camelName);
+    final cubitsRegistration = _generateCubitsRegistration(schema.functions, camelName);
 
-    final useCaseImports = functions
+    final useCaseImports = schema.functions
         .map((f) => "import 'domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
         .join('\n');
 
@@ -72,4 +72,3 @@ $cubitsRegistration
   );''';
   }
 }
-

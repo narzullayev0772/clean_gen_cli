@@ -13,23 +13,22 @@ class DataLayerGenerator {
 
   Future<void> generate({
     required String basePath,
-    required String featureName,
-    required List<FunctionDef> functions,
+    required FeatureSchema schema,
     String modelStrategy = 'empty',
   }) async {
     try {
       final dataPath = p.join(basePath, 'data');
 
       // Generate API Service
-      await _generateApiService(dataPath, featureName, functions);
+      await _generateApiService(dataPath, schema);
 
       // Generate Models
-      await _generateModels(dataPath, featureName, functions, modelStrategy);
+      await _generateModels(dataPath, schema, modelStrategy);
 
       // Generate Repository
-      await _generateRepository(dataPath, featureName, functions);
+      await _generateRepository(dataPath, schema);
 
-      logger.info('✓ Data layer generated for $featureName');
+      logger.info('✓ Data layer generated for ${schema.name}');
     } catch (e) {
       logger.err('Failed to generate data layer: $e');
       rethrow;
@@ -38,11 +37,10 @@ class DataLayerGenerator {
 
   Future<void> _generateApiService(
     String dataPath,
-    String featureName,
-    List<FunctionDef> functions,
+    FeatureSchema schema,
   ) async {
-    final snakeName = FileWriter.toSnakeCase(featureName);
-    final content = ApiServiceTemplate.generate(featureName, functions);
+    final snakeName = FileWriter.toSnakeCase(schema.name);
+    final content = ApiServiceTemplate.generate(schema);
 
     await FileWriter.createDartFile(
       dirPath: p.join(dataPath, 'data_sources'),
@@ -53,15 +51,14 @@ class DataLayerGenerator {
 
   Future<void> _generateModels(
     String dataPath,
-    String featureName,
-    List<FunctionDef> functions,
+    FeatureSchema schema,
     String modelStrategy,
   ) async {
     final requestsPath = p.join(dataPath, 'models', 'requests');
     final responsesPath = p.join(dataPath, 'models', 'responses');
 
     // Generate request and response models for each function
-    for (final function in functions) {
+    for (final function in schema.functions) {
       // Generate request model
       if (function.request != null) {
         final requestModel = ModelGenerator.generateRequestModel(function, strategy: modelStrategy);
@@ -92,14 +89,12 @@ class DataLayerGenerator {
 
   Future<void> _generateRepository(
     String dataPath,
-    String featureName,
-    List<FunctionDef> functions,
+    FeatureSchema schema,
   ) async {
-    final snakeName = FileWriter.toSnakeCase(featureName);
-
+    final snakeName = FileWriter.toSnakeCase(schema.name);
 
     // Repository implementation
-    final implContent = RepositoryImplTemplate.generate(featureName, functions);
+    final implContent = RepositoryImplTemplate.generate(schema);
     await FileWriter.createDartFile(
       dirPath: p.join(dataPath, 'repositories'),
       fileName: '${snakeName}_repository_impl.dart',

@@ -3,7 +3,9 @@ import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 
 class ApiServiceTemplate {
-  static String generate(String featureName, List<FunctionDef> functions) {
+  static String generate(FeatureSchema schema) {
+    final featureName = schema.name;
+    final functions = schema.functions;
     final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
     final className = '${camelName}ApiService';
 
@@ -11,8 +13,12 @@ class ApiServiceTemplate {
     final requestMethods = _generateRequestMethods(functions);
     final modelImports = _generateModelImports(functions);
 
+    final baseResponseImport = schema.globalConfig.imports['base_response'] ?? '';
+    final baseResponseImportLine = baseResponseImport.isNotEmpty ? "import '$baseResponseImport';" : "";
+
     return '''import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
+$baseResponseImportLine
 $modelImports
 
 part '${FileWriter.toSnakeCase(featureName)}_api_service.g.dart';
@@ -64,10 +70,10 @@ $requestMethods
   static String _generateModelImports(List<FunctionDef> functions) {
     final imports = <String>{};
     for (final f in functions) {
-      if (f.request != null) {
+      if (f.request != null && !ModelGenerator.isMagic(f.request)) {
         imports.add("import '../models/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
       }
-      if (f.response != null) {
+      if (f.response != null && !ModelGenerator.isMagic(f.response)) {
         imports.add("import '../models/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
       }
     }
@@ -75,6 +81,3 @@ $requestMethods
     return sortedImports.join('\n');
   }
 }
-
-
-

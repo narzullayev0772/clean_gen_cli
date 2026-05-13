@@ -13,19 +13,18 @@ class DomainLayerGenerator {
 
   Future<void> generate({
     required String basePath,
-    required String featureName,
-    required List<FunctionDef> functions,
+    required FeatureSchema schema,
   }) async {
     try {
       final domainPath = p.join(basePath, 'domain');
 
       // Generate Repository interface
-      await _generateRepositoryInterface(domainPath, featureName, functions);
+      await _generateRepositoryInterface(domainPath, schema);
 
       // Generate UseCases
-      await _generateUseCases(domainPath, featureName, functions);
+      await _generateUseCases(domainPath, schema);
 
-      logger.info('✓ Domain layer generated for $featureName');
+      logger.info('✓ Domain layer generated for ${schema.name}');
     } catch (e) {
       logger.err('Failed to generate domain layer: $e');
       rethrow;
@@ -34,13 +33,12 @@ class DomainLayerGenerator {
 
   Future<void> _generateRepositoryInterface(
     String domainPath,
-    String featureName,
-    List<FunctionDef> functions,
+    FeatureSchema schema,
   ) async {
-    final snakeName = FileWriter.toSnakeCase(featureName);
+    final snakeName = FileWriter.toSnakeCase(schema.name);
     final repoPath = p.join(domainPath, 'repositories');
 
-    final content = RepositoryTemplate.generate(featureName, functions);
+    final content = RepositoryTemplate.generate(schema);
 
     await FileWriter.createDartFile(
       dirPath: repoPath,
@@ -51,15 +49,14 @@ class DomainLayerGenerator {
 
   Future<void> _generateUseCases(
     String domainPath,
-    String featureName,
-    List<FunctionDef> functions,
+    FeatureSchema schema,
   ) async {
     final useCasesPath = p.join(domainPath, 'use_cases');
 
-    for (final function in functions) {
+    for (final function in schema.functions) {
       final snakeName = FileWriter.toSnakeCase(function.name);
 
-      final content = UseCaseTemplate.generate(function, featureName);
+      final content = UseCaseTemplate.generate(function, schema);
 
       await FileWriter.createDartFile(
         dirPath: useCasesPath,

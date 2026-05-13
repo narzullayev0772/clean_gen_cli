@@ -1,10 +1,11 @@
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
-
-import '../utils/model_generator.dart';
+import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 
 class CubitTemplate {
-  static String generate(String featureName, List<FunctionDef> functions) {
+  static String generate(FeatureSchema schema) {
+    final featureName = schema.name;
+    final functions = schema.functions;
     final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
     final className = '${camelName}Cubit';
     final stateName = '${camelName}State';
@@ -17,10 +18,14 @@ class CubitTemplate {
 
     final useCaseImportsList = functions
         .map((f) => "import '../../domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
-        .toList()..sort();
+        .toList()
+      ..sort();
     final useCaseImports = useCaseImportsList.join('\n');
 
+    final fetcherImport = schema.globalConfig.config['fetcher_import'] ?? '../../../../core/utils/fetcher.dart';
+
     return '''import 'package:bloc/bloc.dart';
+import '$fetcherImport';
 $useCaseImports
 $modelImports
 
@@ -86,10 +91,10 @@ $methods
   static String _generateModelImports(List<FunctionDef> functions, String relativePath) {
     final imports = <String>{};
     for (final f in functions) {
-      if (f.request != null) {
+      if (f.request != null && !ModelGenerator.isMagic(f.request)) {
         imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
       }
-      if (f.response != null) {
+      if (f.response != null && !ModelGenerator.isMagic(f.response)) {
         imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
       }
     }
@@ -99,9 +104,13 @@ $methods
 }
 
 class CubitStateTemplate {
-  static String generate(String featureName, List<FunctionDef> functions) {
+  static String generate(FeatureSchema schema) {
+    final featureName = schema.name;
+    final functions = schema.functions;
     final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
     final stateName = '${camelName}State';
+
+    final modelImports = CubitTemplate._generateModelImports(functions, '../../data/models');
 
     final fields = functions.map((f) {
       final responseType = ModelGenerator.getResponseModelType(f);
@@ -137,6 +146,8 @@ class CubitStateTemplate {
 
     return '''part of '${FileWriter.toSnakeCase(featureName)}_cubit.dart';
 
+$modelImports
+
 class $stateName {
 $fields
 
@@ -161,5 +172,3 @@ $initialFields
 ''';
   }
 }
-
-

@@ -39,25 +39,22 @@ class FeatureGenerator {
       // Generate all layers
       await _dataLayer.generate(
         basePath: basePath,
-        featureName: schema.name,
-        functions: schema.functions,
+        schema: schema,
         modelStrategy: modelStrategy,
       );
 
       await _domainLayer.generate(
         basePath: basePath,
-        featureName: schema.name,
-        functions: schema.functions,
+        schema: schema,
       );
 
       await _presentationLayer.generate(
         basePath: basePath,
-        featureName: schema.name,
-        functions: schema.functions,
+        schema: schema,
       );
 
       // Generate DI file
-      await _generateDI(basePath, schema.name, schema.functions);
+      await _generateDI(basePath, schema);
 
       // Format generated code
       await _formatGeneratedCode(basePath);
@@ -93,13 +90,12 @@ class FeatureGenerator {
 
   Future<void> _generateDI(
     String basePath,
-    String featureName,
-    List<FunctionDef> functions,
+    FeatureSchema schema,
   ) async {
-    final snakeName = FileWriter.toSnakeCase(featureName);
+    final snakeName = FileWriter.toSnakeCase(schema.name);
     final diFileName = '${snakeName}_di.dart';
 
-    final content = DITemplate.generate(featureName, functions);
+    final content = DITemplate.generate(schema);
 
     await FileWriter.createDartFile(
       dirPath: basePath,

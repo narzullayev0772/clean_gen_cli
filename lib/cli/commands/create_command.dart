@@ -85,7 +85,9 @@ class CreateCommand extends Command<void> {
         configJson = _yamlToMap(yaml) as Map<String, dynamic>;
       }
 
-      final schema = FeatureSchema.fromJson(configJson);
+      // Load global config
+      final globalConfig = await _loadGlobalConfig();
+      final schema = FeatureSchema.fromJson(configJson, globalConfig);
 
       // Validate schema
       if (!schema.isValid()) {
@@ -153,6 +155,22 @@ class CreateCommand extends Command<void> {
       return yaml.map((item) => _yamlToMap(item)).toList();
     } else {
       return yaml;
+    }
+  }
+
+  Future<GlobalConfig> _loadGlobalConfig() async {
+    final configFile = File(p.join('config', 'config.json'));
+    if (!configFile.existsSync()) {
+      return GlobalConfig();
+    }
+
+    try {
+      final content = await configFile.readAsString();
+      final json = jsonDecode(content) as Map<String, dynamic>;
+      return GlobalConfig.fromJson(json);
+    } catch (e) {
+      _logger.warn('Failed to load global config: $e. Using defaults.');
+      return GlobalConfig();
     }
   }
 

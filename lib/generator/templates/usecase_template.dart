@@ -3,7 +3,8 @@ import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 
 class UseCaseTemplate {
-  static String generate(FunctionDef function, String featureName) {
+  static String generate(FunctionDef function, FeatureSchema schema) {
+    final featureName = schema.name;
     final camelFeatureName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
     final className = '${FileWriter.toCamelCase(function.name)}UseCase';
     final repoName = '${camelFeatureName}Repository';
@@ -30,16 +31,12 @@ class $className implements UseCase<DataState<$returnType>, $requestType> {
   static String _generateModelImports(FunctionDef function, String relativePath) {
     final imports = <String>{};
     if (function.request != null && !ModelGenerator.isMagic(function.request)) {
-      imports.add(
-          "import '$relativePath/requests/${FileWriter.toSnakeCase(function.name)}_request.dart';");
+      imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(function.name)}_request.dart';");
     }
     if (function.response != null && !ModelGenerator.isMagic(function.response)) {
-      imports.add(
-          "import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';");
+      imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';");
     }
     final sortedImports = imports.toList()..sort();
     return sortedImports.join('\n');
   }
 }
-
-

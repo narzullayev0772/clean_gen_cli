@@ -11,16 +11,15 @@ class PresentationLayerGenerator {
 
   Future<void> generate({
     required String basePath,
-    required String featureName,
-    required List<FunctionDef> functions,
+    required FeatureSchema schema,
   }) async {
     try {
       final presentationPath = p.join(basePath, 'presentation');
 
       // Generate Cubit
-      await _generateCubit(presentationPath, featureName, functions);
+      await _generateCubit(presentationPath, schema);
 
-      logger.info('✓ Presentation layer generated for $featureName');
+      logger.info('✓ Presentation layer generated for ${schema.name}');
     } catch (e) {
       logger.err('Failed to generate presentation layer: $e');
       rethrow;
@@ -29,14 +28,13 @@ class PresentationLayerGenerator {
 
   Future<void> _generateCubit(
     String presentationPath,
-    String featureName,
-    List<FunctionDef> functions,
+    FeatureSchema schema,
   ) async {
-    final snakeName = FileWriter.toSnakeCase(featureName);
+    final snakeName = FileWriter.toSnakeCase(schema.name);
     final managerPath = p.join(presentationPath, 'cubit');
 
     // Generate Cubit
-    final cubbitContent = CubitTemplate.generate(featureName, functions);
+    final cubbitContent = CubitTemplate.generate(schema);
     await FileWriter.createDartFile(
       dirPath: managerPath,
       fileName: '${snakeName}_cubit.dart',
@@ -44,7 +42,7 @@ class PresentationLayerGenerator {
     );
 
     // Generate State
-    final stateContent = CubitStateTemplate.generate(featureName, functions);
+    final stateContent = CubitStateTemplate.generate(schema);
     await FileWriter.createDartFile(
       dirPath: managerPath,
       fileName: '${snakeName}_state.dart',
