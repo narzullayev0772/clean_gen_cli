@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=../clean_gen_schema.json
+name: auth
+functions:
+  - name: signIn
+    api: /api/auth/sign-in
+    method: POST
+    request:
+      email: string
+      password: string
+    response:
+      token: string
+      user:
+        id: 1
+        email: string
+        name: string
+  - name: signUp
+    api: /api/auth/sign-up
+    method: POST
+    request:
+      email: string
+      password: string
+      name: string
+    response:
+      token: string
+  - name: logout
+    api: /api/auth/logout
+    method: POST
+  - name: getUsersList
+    api: /users/list
+    pagination: true
+    query: true
+    response:
+      - id: 1
+        email: string
+        name: string
+    request:
+      page: 1
+      pageSize: 10

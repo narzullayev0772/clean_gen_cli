@@ -5,6 +5,7 @@ import 'package:clean_gen_cli/generator/feature_generator.dart';
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as p;
+import 'package:yaml/yaml.dart';
 
 class CreateCommand extends Command<void> {
   final Logger _logger;
@@ -67,7 +68,15 @@ class CreateCommand extends Command<void> {
 
       // Parse config
       final configContent = await configFile.readAsString();
-      final configJson = jsonDecode(configContent) as Map<String, dynamic>;
+      Map<String, dynamic> configJson;
+
+      if (resolvedPath.endsWith('.json')) {
+        configJson = jsonDecode(configContent) as Map<String, dynamic>;
+      } else {
+        final yaml = loadYaml(configContent);
+        configJson = _yamlToMap(yaml) as Map<String, dynamic>;
+      }
+
       final schema = FeatureSchema.fromJson(configJson);
 
       // Validate schema
@@ -111,11 +120,31 @@ class CreateCommand extends Command<void> {
   }
 
   String _extractFeatureName(String fileName) {
-    // Remove .config.json extension
+    // Remove .config.json or .config.yaml/yml extension
     if (fileName.endsWith('.config.json')) {
       return fileName.substring(0, fileName.length - '.config.json'.length);
     }
+    if (fileName.endsWith('.config.yaml')) {
+      return fileName.substring(0, fileName.length - '.config.yaml'.length);
+    }
+    if (fileName.endsWith('.config.yml')) {
+      return fileName.substring(0, fileName.length - '.config.yml'.length);
+    }
     return '';
+  }
+
+  dynamic _yamlToMap(dynamic yaml) {
+    if (yaml is YamlMap) {
+      final map = <String, dynamic>{};
+      yaml.forEach((key, value) {
+        map[key.toString()] = _yamlToMap(value);
+      });
+      return map;
+    } else if (yaml is YamlList) {
+      return yaml.map((item) => _yamlToMap(item)).toList();
+    } else {
+      return yaml;
+    }
   }
 
   Future<void> _initializeFeature(String basePath, String featureName, bool hasFunctions) async {
