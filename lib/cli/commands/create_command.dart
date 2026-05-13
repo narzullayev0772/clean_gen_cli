@@ -27,7 +27,7 @@ class CreateCommand extends Command<void> {
     argParser.addOption(
       'model',
       abbr: 'm',
-      defaultsTo: 'empty',
+      defaultsTo: 'generate',
       allowed: ['empty', 'serialize', 'generate'],
       help: 'Model generation strategy.',
     );

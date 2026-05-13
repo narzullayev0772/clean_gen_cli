@@ -68,41 +68,94 @@ class $className {
   static String _generatePlainModel(String className, dynamic data) {
     if (data is! Map) return _generateEmptyModel(className, data);
 
-    final fields = <String>[];
-    final constructorParams = <String>[];
-    final fromJsonLines = <String>[];
-    final toJsonLines = <String>[];
+    final fields = <String>[]; // declarations
+    final constructorParams = <String>[]; // named params
+    final fromJsonAssignments = <String>[]; // inside fromJson constructor body
+    final toJsonLines = <String>[]; // inside toJson
+
+    bool needsCoreModelsImport = false;
 
     data.forEach((key, value) {
       final dartKey = FileWriter.toLowerCamelCase(key.toString());
       final type = _getDartType(value);
 
-      fields.add('  final $type? $dartKey;');
-      constructorParams.add('this.$dartKey');
-      fromJsonLines.add("      $dartKey: json['$key'] as $type?,");
-      toJsonLines.add("      '$key': $dartKey,");
+      // mutable nullable field
+      fields.add('  $type? $dartKey;');
+      constructorParams.add('this.$dartKey,');
+
+      // fromJson assignment
+      if (type.startsWith('List<')) {
+        final inner = type.substring(5, type.length - 1);
+        if (_isPrimitive(inner) || inner == 'dynamic' || inner.startsWith('Map<')) {
+          // primitive list: assign directly
+          fromJsonAssignments.add("    $dartKey = json['$key'];");
+        } else {
+          // list of models: use foreach pattern for safety and readability
+          needsCoreModelsImport = true;
+          fromJsonAssignments.add("    if (json['$key'] != null) {\n      $dartKey = [];\n      json['$key'].forEach((v) {\n        $dartKey?.add($inner.fromJson(v));\n      });\n    }");
+        }
+
+        // toJson for list
+        if (_isPrimitive(inner) || inner == 'dynamic' || inner.startsWith('Map<')) {
+          toJsonLines.add("    map['$key'] = $dartKey;");
+        } else {
+          toJsonLines.add("    if ($dartKey != null) {\n      map['$key'] = $dartKey?.map((e) => e.toJson()).toList();\n    }");
+        }
+      } else if (type == 'Map<String, dynamic>') {
+        // assign map directly
+        fromJsonAssignments.add("    $dartKey = json['$key'];");
+        toJsonLines.add("    map['$key'] = $dartKey;");
+      } else if (_isPrimitive(type) || type == 'dynamic') {
+        // assign primitive directly from json (avoid runtime cast in generated code)
+        fromJsonAssignments.add("    $dartKey = json['$key'];");
+        toJsonLines.add("    map['$key'] = $dartKey;");
+      } else {
+        // custom model
+        needsCoreModelsImport = true;
+        fromJsonAssignments.add("    $dartKey = json['$key'] != null ? $type.fromJson(json['$key']) : null;");
+        toJsonLines.add("    if ($dartKey != null) {\n      map['$key'] = $dartKey?.toJson();\n    }");
+      }
     });
 
-    return '''class $className {
+    // copyWith params and assignments
+    final copyWithParams = data.entries.map((e) {
+      final dartKey = FileWriter.toLowerCamelCase(e.key.toString());
+      final type = _getDartType(e.value);
+      return '    $type? $dartKey,';
+    }).join('\n');
+
+    final copyWithAssignments = data.keys.map((key) {
+      final dartKey = FileWriter.toLowerCamelCase(key.toString());
+      return '      $dartKey: $dartKey ?? this.$dartKey,';
+    }).join('\n');
+
+    final importLine = needsCoreModelsImport ? "import 'package:uyqur_core/core/models/models.dart';\n\n" : '';
+
+    return '''${importLine}class $className {
 ${fields.join('\n')}
 
-  const $className({
-    ${constructorParams.join(',\n    ')},
+  $className({
+    ${constructorParams.join('\n    ')}
   });
 
-  factory $className.fromJson(Map<String, dynamic> json) {
-    return $className(
-${fromJsonLines.join('\n')}
-    );
+  $className.fromJson(dynamic json) {
+${fromJsonAssignments.join('\n')}
   }
 
+  ${copyWithParams.isEmpty ? '' : ''}
+  $className copyWith({
+$copyWithParams
+  }) => $className(
+$copyWithAssignments
+  );
+
   Map<String, dynamic> toJson() {
-    return {
+    final map = <String, dynamic>{};
 ${toJsonLines.join('\n')}
-    };
+    return map;
   }
 }
-''';
+    ''';
   }
 
   static String _generateSerializableModel(String className, String fileName, dynamic data) {
@@ -152,6 +205,10 @@ ${fields.join('\n')}
     }
     if (value is Map) return 'Map<String, dynamic>';
     return 'dynamic';
+  }
+
+  static bool _isPrimitive(String type) {
+    return ['String', 'int', 'double', 'bool', 'num', 'dynamic'].contains(type);
   }
 
   /// Get request model type name
