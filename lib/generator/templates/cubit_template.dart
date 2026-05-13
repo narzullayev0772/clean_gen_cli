@@ -11,7 +11,7 @@ class CubitTemplate {
     final snakeName = FileWriter.toSnakeCase(featureName);
 
     final dependencies = _generateDependencies(functions);
-    final constructor = _generateConstructor(className, functions);
+    final constructor = _generateConstructor(className, functions, stateName);
     final methods = _generateMethods(functions, camelName);
     final modelImports = _generateModelImports(functions, '../../data/models');
 
@@ -42,14 +42,14 @@ $methods
         .join('\n');
   }
 
-  static String _generateConstructor(String className, List<FunctionDef> functions) {
+  static String _generateConstructor(String className, List<FunctionDef> functions, String stateName) {
     final params = functions
         .map((f) => "this._${f.name[0].toLowerCase()}${f.name.substring(1)}UseCase,")
         .join('\n    ');
 
     return '''  $className(
     $params
-  ) : super(AuthState.initial());''';
+  ) : super($stateName.initial());''';
   }
 
   static String _generateMethods(List<FunctionDef> functions, String camelName) {

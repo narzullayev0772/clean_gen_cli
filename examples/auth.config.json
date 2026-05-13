@@ -19,6 +19,11 @@
       }
     },
     {
+      "name": "logout",
+      "api": "/api/auth/logout",
+      "method": "PUT"
+    },
+    {
       "name": "getUsersList",
       "api": "/users/list",
       "pagination": true,

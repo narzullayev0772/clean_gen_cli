@@ -32,7 +32,7 @@ $requestMethods
 
   static String _generateUrlConstants(List<FunctionDef> functions) {
     final constants = functions.map((func) {
-      final constName = FileWriter.toSnakeCase(func.name);
+      final constName = FileWriter.toLowerCamelCase(func.name);
       return "  static const String _$constName = '${func.api}';";
     }).join('\n');
 
@@ -41,21 +41,21 @@ $requestMethods
 
   static String _generateRequestMethods(List<FunctionDef> functions) {
     final methods = functions.map((func) {
-      final constName = FileWriter.toSnakeCase(func.name);
+      final constName = FileWriter.toLowerCamelCase(func.name);
       final responseType = ModelGenerator.getResponseModelType(func);
       final requestType = ModelGenerator.getRequestModelType(func);
       final hasRequest = func.request != null;
 
-      if (func.method == 'GET') {
-        return '''  @GET(_$constName)
-  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}();''';
-      } else if (hasRequest) {
-        return '''  @${func.method}(_$constName)
-  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}(@Body() $requestType request);''';
-      } else {
-        return '''  @${func.method}(_$constName)
-  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}();''';
+      String params = '';
+      if (hasRequest) {
+        // Default to true for body if not specified, unless it's a GET request
+        final useBody = func.body ?? (func.method != 'GET');
+        final annotation = useBody ? '@Body()' : '@Queries()';
+        params = '$annotation $requestType request';
       }
+
+      return '''  @${func.method}(_$constName)
+  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}($params);''';
     }).join('\n\n  ');
 
     return methods;

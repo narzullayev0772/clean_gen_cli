@@ -24,7 +24,14 @@ class FileWriter {
 
   static String toCamelCase(String input) {
     if (input.isEmpty) return input;
-    return input[0].toUpperCase() + input.substring(1);
+    final camel = input.split('_').map((s) => s.isEmpty ? '' : s[0].toUpperCase() + s.substring(1)).join();
+    return camel[0].toUpperCase() + camel.substring(1);
+  }
+
+  static String toLowerCamelCase(String input) {
+    if (input.isEmpty) return input;
+    final camel = toCamelCase(input);
+    return camel[0].toLowerCase() + camel.substring(1);
   }
 
   static String toSnakeCase(String input) {
