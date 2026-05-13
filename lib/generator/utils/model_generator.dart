@@ -2,9 +2,21 @@ import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 
 class ModelGenerator {
+  static bool _isMagic(dynamic value) {
+    if (value is String && value.startsWith('\$')) return true;
+    if (value is List && value.isNotEmpty && _isMagic(value.first)) return true;
+    return false;
+  }
+
+  static String _getMagicName(dynamic value) {
+    if (value is String && value.startsWith('\$')) return value.substring(1);
+    if (value is List && value.isNotEmpty) return _getMagicName(value.first);
+    return '';
+  }
+
   /// Generate request model class from schema
   static String generateRequestModel(FunctionDef function, {String strategy = 'empty'}) {
-    if (function.request == null) {
+    if (function.request == null || _isMagic(function.request)) {
       return '';
     }
 
@@ -16,7 +28,7 @@ class ModelGenerator {
 
   /// Generate response model class from schema
   static String generateResponseModel(FunctionDef function, {String strategy = 'empty'}) {
-    if (function.response == null) {
+    if (function.response == null || _isMagic(function.response)) {
       return '';
     }
 
@@ -127,10 +139,13 @@ ${fields.join('\n')}
   }
 
   static String _getDartType(dynamic value) {
+    if (value is String) {
+      if (value.startsWith('\$')) return value.substring(1);
+      return 'String';
+    }
     if (value is int) return 'int';
     if (value is double) return 'double';
     if (value is bool) return 'bool';
-    if (value is String) return 'String';
     if (value is List) {
       if (value.isEmpty) return 'List<dynamic>';
       return 'List<${_getDartType(value.first)}>';
@@ -144,6 +159,9 @@ ${fields.join('\n')}
     if (function.request == null) {
       return 'dynamic';
     }
+    if (_isMagic(function.request)) {
+      return _getMagicName(function.request);
+    }
     return '${FileWriter.toCamelCase(function.name)}RequestBody';
   }
 
@@ -151,6 +169,14 @@ ${fields.join('\n')}
   static String getResponseModelType(FunctionDef function) {
     if (function.response == null) {
       return 'dynamic';
+    }
+
+    if (_isMagic(function.response)) {
+      final name = _getMagicName(function.response);
+      if (function.response is List || function.pagination) {
+        return 'List<$name>';
+      }
+      return name;
     }
 
     final modelName = '${FileWriter.toCamelCase(function.name)}Model';
@@ -166,6 +192,9 @@ ${fields.join('\n')}
   static String getBaseResponseModelType(FunctionDef function) {
     if (function.response == null) {
       return 'dynamic';
+    }
+    if (_isMagic(function.response)) {
+      return _getMagicName(function.response);
     }
     return '${FileWriter.toCamelCase(function.name)}Model';
   }
