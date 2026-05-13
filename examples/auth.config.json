@@ -19,27 +19,20 @@
       }
     },
     {
-      "name": "signUp",
-      "api": "/api/auth/sign-up",
-      "method": "POST",
-      "request": {
-        "email": "string",
-        "password": "string",
-        "name": "string"
-      },
-      "response": {
-        "token": "string",
-        "user": {
+      "name": "getUsersList",
+      "api": "/users/list",
+      "pagination": true,
+      "response": [
+        {
           "id": 1,
           "email": "string",
           "name": "string"
         }
+      ],
+      "request": {
+        "page": 1,
+        "pageSize": 10
       }
-    },
-    {
-      "name": "logout",
-      "api": "/api/auth/logout",
-      "method": "POST"
     }
   ]
 }

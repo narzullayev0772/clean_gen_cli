@@ -105,7 +105,10 @@ class CubitStateTemplate {
 
     final fields = functions.map((f) {
       final responseType = ModelGenerator.getResponseModelType(f);
-      final type = f.pagination ? 'BasePaginationState<$responseType>' : 'BaseState<$responseType>';
+      final baseResponseType = ModelGenerator.getBaseResponseModelType(f);
+      final type = f.pagination
+          ? 'BasePaginationState<$baseResponseType>'
+          : 'BaseState<$responseType>';
       return '  final $type ${f.name}State;';
     }).join('\n');
 
@@ -113,7 +116,10 @@ class CubitStateTemplate {
 
     final copyWithParams = functions.map((f) {
       final responseType = ModelGenerator.getResponseModelType(f);
-      final type = f.pagination ? 'BasePaginationState<$responseType>' : 'BaseState<$responseType>';
+      final baseResponseType = ModelGenerator.getBaseResponseModelType(f);
+      final type = f.pagination
+          ? 'BasePaginationState<$baseResponseType>'
+          : 'BaseState<$responseType>';
       return '    $type? ${f.name}State,';
     }).join('\n');
 
@@ -121,8 +127,9 @@ class CubitStateTemplate {
 
     final initialFields = functions.map((f) {
       final responseType = ModelGenerator.getResponseModelType(f);
+      final baseResponseType = ModelGenerator.getBaseResponseModelType(f);
       if (f.pagination) {
-        return '      ${f.name}State: BasePaginationState<$responseType>(query: BasePagingQuery()),';
+        return '      ${f.name}State: BasePaginationState<$baseResponseType>(query: BasePagingQuery()),';
       } else {
         return '      ${f.name}State: BaseState<$responseType>.initial(),';
       }

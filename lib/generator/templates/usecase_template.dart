@@ -12,7 +12,7 @@ class UseCaseTemplate {
     final returnType = responseType == 'dynamic' ? 'dynamic' : '$responseType?';
     final modelImports = _generateModelImports(function, '../../data/models');
 
-    return '''import '../../repositories/${FileWriter.toSnakeCase(featureName)}_repository.dart';
+    return '''import '../repositories/${FileWriter.toSnakeCase(featureName)}_repository.dart';
 $modelImports
 
 class $className implements UseCase<DataState<$returnType>, $requestType> {

@@ -81,6 +81,14 @@ class $modelName {
     return modelName;
   }
 
+  /// Get base response model type name (without List)
+  static String getBaseResponseModelType(FunctionDef function) {
+    if (function.response == null) {
+      return 'dynamic';
+    }
+    return '${FileWriter.toCamelCase(function.name)}Model';
+  }
+
   /// Format JSON schema as comment block
   static String _formatJsonComment(dynamic schema) {
     if (schema == null) return '';
