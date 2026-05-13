@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Clean Gen Feature Schema",
+  "type": "object",
+  "required": [
+    "name",
+    "functions"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the feature (e.g., auth, profile)."
+    },
+    "functions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "api"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the function/method (e.g., signIn)."
+          },
+          "api": {
+            "type": "string",
+            "description": "The API endpoint path."
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ],
+            "default": "GET"
+          },
+          "pagination": {
+            "type": "boolean",
+            "default": false
+          },
+          "query": {
+            "type": "boolean",
+            "description": "If true, uses @Queries() annotation. If false, uses @Body().",
+            "default": false
+          },
+          "request": {
+            "type": [
+              "object",
+              "array"
+            ],
+            "description": "Example request payload for model generation."
+          },
+          "response": {
+            "type": [
+              "object",
+              "array"
+            ],
+            "description": "Example response payload for model generation."
+          }
+        }
+      }
+    }
+  }
+}

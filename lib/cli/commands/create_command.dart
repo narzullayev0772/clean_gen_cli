@@ -72,7 +72,9 @@ class CreateCommand extends Command<void> {
 
       // Validate schema
       if (!schema.isValid()) {
-        progress.fail('Invalid schema: "name" or "functions" field is missing or empty');
+        progress.fail('Invalid schema in $configPath');
+        _logger.err('Please ensure "name" is not empty and all "functions" have a "name" and "api".');
+        _logger.err('Valid methods are: ${FunctionDef.validMethods.join(', ')}');
         return;
       }
 

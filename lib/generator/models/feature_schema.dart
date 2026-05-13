@@ -16,7 +16,11 @@ class FeatureSchema {
     );
   }
 
-  bool isValid() => name.isNotEmpty;
+  bool isValid() {
+    if (name.isEmpty) return false;
+    if (functions.isEmpty) return false;
+    return functions.every((f) => f.isValid());
+  }
 }
 
 class FunctionDef {
@@ -27,6 +31,8 @@ class FunctionDef {
   final dynamic response; // Can be Map or List
   final bool pagination;
   final bool? query;
+
+  static const List<String> validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
   FunctionDef({
     required this.name,
@@ -42,7 +48,7 @@ class FunctionDef {
     return FunctionDef(
       name: json['name'] as String,
       api: json['api'] as String,
-      method: (json['method'] as String?) ?? 'GET',
+      method: (json['method'] as String?)?.toUpperCase() ?? 'GET',
       request: json['request'], // Accept both Map and List
       response: json['response'], // Accept both Map and List
       pagination: (json['pagination'] as bool?) ?? false,
@@ -50,6 +56,10 @@ class FunctionDef {
     );
   }
 
-  bool isValid() => name.isNotEmpty && api.isNotEmpty;
+  bool isValid() {
+    if (name.isEmpty || api.isEmpty) return false;
+    if (!validMethods.contains(method)) return false;
+    return true;
+  }
 }
 

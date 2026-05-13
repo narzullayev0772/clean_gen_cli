@@ -1,4 +1,5 @@
 {
+  "$schema": "../clean_gen_schema.json",
   "name": "auth",
   "functions": [
     {
@@ -19,14 +20,28 @@
       }
     },
     {
+      "name": "signUp",
+      "api": "/api/auth/sign-up",
+      "method": "GET",
+      "request": {
+        "email": "string",
+        "password": "string",
+        "name": "string"
+      },
+      "response": {
+        "token": "string"
+      }
+    },
+    {
       "name": "logout",
       "api": "/api/auth/logout",
-      "method": "PUT"
+      "method": "POST"
     },
     {
       "name": "getUsersList",
       "api": "/users/list",
       "pagination": true,
+      "query": true,
       "response": [
         {
           "id": 1,
@@ -37,8 +52,7 @@
       "request": {
         "page": 1,
         "pageSize": 10
-      },
-      "body": false
+      }
     }
   ]
 }
