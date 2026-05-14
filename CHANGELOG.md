@@ -10,6 +10,13 @@
 
 - Automatic release on push to main (2026-05-14)
 
+## 1.3.0
+
+- **Improved Pub Score**: Updated dependencies to the latest stable versions.
+- **Documentation**: Added comprehensive dartdoc comments to all public classes and methods.
+- **Example**: Added an example documentation and ensured the example folder is correctly structured for pub.dev.
+- **Repository**: Fixed repository and homepage URLs.
+
 ## 1.1.0
 
 - **New Command**: Added `update` command to incrementally add new functions to existing features.

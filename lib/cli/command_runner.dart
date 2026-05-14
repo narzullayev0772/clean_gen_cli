@@ -5,9 +5,13 @@ import 'package:clean_gen_cli/cli/commands/update_command.dart';
 import 'package:clean_gen_cli/cli/commands/version_command.dart';
 import 'package:mason_logger/mason_logger.dart';
 
+/// The command runner for the Clean Gen CLI.
+///
+/// It coordinates all the available commands like `create`, `update`, `init`, and `version`.
 class CleanGenCommandRunner extends CommandRunner<void> {
   final Logger _logger;
 
+  /// Creates a new [CleanGenCommandRunner].
   CleanGenCommandRunner({Logger? logger})
     : _logger = logger ?? Logger(),
       super(

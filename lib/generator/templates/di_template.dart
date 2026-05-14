@@ -1,7 +1,11 @@
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 
+/// A template generator for the Dependency Injection (DI) layer.
+///
+/// It generates the registration logic for DataSources, Repositories, UseCases, and Cubits.
 class DITemplate {
+  /// Generates the complete source code for the feature's DI file.
   static String generate(FeatureSchema schema) {
     final camelName = FileWriter.toCamelCase(
       FileWriter.toSnakeCase(schema.name),

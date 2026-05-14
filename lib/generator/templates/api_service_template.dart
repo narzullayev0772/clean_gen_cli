@@ -2,7 +2,11 @@ import 'package:clean_gen_cli/generator/models/feature_schema.dart';
 import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 
+/// A template generator for the API Service (DataSource) layer.
+///
+/// It generates a Dio/Retrofit compatible interface based on the feature schema.
 class ApiServiceTemplate {
+  /// Generates the complete source code for the API Service file.
   static String generate(FeatureSchema schema) {
     final featureName = schema.name;
     final functions = schema.functions;
