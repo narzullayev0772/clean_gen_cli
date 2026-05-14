@@ -1,6 +1,6 @@
 name: clean_gen_cli
 description: A powerful CLI tool for Flutter developers to generate Clean Architecture features from JSON or YAML configuration files.
-version: 1.0.7
+version: 1.1.0
 homepage: https://github.com/narzullayev0772/clean_gen_cli
 repository: https://github.com/narzullayev0772/clean_gen_cli
 
