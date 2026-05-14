@@ -84,6 +84,16 @@ clean_gen create <config-file> [options]
 - `-o, --output`: Set the output directory (default: `lib/src/features`).
 - `-m, --model`: Model generation strategy: `empty`, `serialize`, or `generate` (default: `generate`).
 
+### `update`
+Updates an existing feature with new functions. It will only add missing UseCases, Repository methods, and DataSource endpoints without overwriting your existing manual changes.
+```bash
+clean_gen update <config-file> [options]
+```
+
+**Options:**
+- `-o, --output`: Set the output directory where the feature exists.
+- `-m, --model`: Model generation strategy for new models.
+
 ### `version`
 Prints the current version of the CLI.
 

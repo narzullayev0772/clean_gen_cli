@@ -27,6 +27,7 @@ class FeatureGenerator {
     required String basePath,
     required FeatureSchema schema,
     String modelStrategy = 'empty',
+    bool updateOnly = false,
   }) async {
     final timer = Stopwatch()..start();
 
@@ -34,21 +35,30 @@ class FeatureGenerator {
       _validatePath(basePath);
       schema.functions.forEach(_validateFunction);
 
-      logger.info('Generating feature: ${schema.name}');
+      logger.info(
+        '${updateOnly ? 'Updating' : 'Generating'} feature: ${schema.name}',
+      );
 
       // Generate all layers
       await _dataLayer.generate(
         basePath: basePath,
         schema: schema,
         modelStrategy: modelStrategy,
+        updateOnly: updateOnly,
       );
 
-      await _domainLayer.generate(basePath: basePath, schema: schema);
+      await _domainLayer.generate(
+        basePath: basePath,
+        schema: schema,
+        updateOnly: updateOnly,
+      );
 
-      await _presentationLayer.generate(basePath: basePath, schema: schema);
+      if (!updateOnly) {
+        await _presentationLayer.generate(basePath: basePath, schema: schema);
+      }
 
-      // Generate DI file
-      await _generateDI(basePath, schema);
+      // Generate/Update DI file
+      await _generateDI(basePath, schema, updateOnly);
 
       // Format generated code
       await _formatGeneratedCode(basePath);
@@ -58,10 +68,10 @@ class FeatureGenerator {
 
       timer.stop();
       logger.success(
-        '✓ Feature generated successfully (${timer.elapsedMilliseconds}ms)',
+        '✓ Feature ${updateOnly ? 'updated' : 'generated'} successfully (${timer.elapsedMilliseconds}ms)',
       );
     } catch (e) {
-      logger.err('Feature generation failed: $e');
+      logger.err('Feature ${updateOnly ? 'update' : 'generation'} failed: $e');
       rethrow;
     }
   }
@@ -82,19 +92,42 @@ class FeatureGenerator {
     }
   }
 
-  Future<void> _generateDI(String basePath, FeatureSchema schema) async {
+  Future<void> _generateDI(
+    String basePath,
+    FeatureSchema schema,
+    bool updateOnly,
+  ) async {
     final snakeName = FileWriter.toSnakeCase(schema.name);
     final diFileName = '${snakeName}_di.dart';
+    final filePath = p.join(basePath, diFileName);
 
-    final content = DITemplate.generate(schema);
+    if (updateOnly && File(filePath).existsSync()) {
+      final existingContent = await File(filePath).readAsString();
+      final template = DITemplate.generate(schema);
 
-    await FileWriter.createDartFile(
-      dirPath: basePath,
-      fileName: diFileName,
-      content: content,
-    );
+      // Extract only the setup lines from the template
+      final lines = template.split('\n');
+      for (final line in lines) {
+        if ((line.contains('locator.registerLazySingleton') ||
+                line.contains('locator.registerFactory')) &&
+            !existingContent.contains(line.trim())) {
+          await FileWriter.injectToClass(
+            filePath: filePath,
+            newContent: line.trim(),
+          );
+        }
+      }
+    } else {
+      final content = DITemplate.generate(schema);
 
-    logger.info('✓ DI file generated: $diFileName');
+      await FileWriter.createDartFile(
+        dirPath: basePath,
+        fileName: diFileName,
+        content: content,
+      );
+
+      logger.info('✓ DI file generated: $diFileName');
+    }
   }
 
   Future<void> _formatGeneratedCode(String basePath) async {

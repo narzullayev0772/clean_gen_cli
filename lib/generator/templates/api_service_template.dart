@@ -42,55 +42,61 @@ $requestMethods
   }
 
   static String _generateUrlConstants(List<FunctionDef> functions) {
-    final constants = functions
-        .map((func) {
-          final constName = FileWriter.toLowerCamelCase(func.name);
-          return "  static const String _$constName = '${func.api}';";
-        })
-        .join('\n');
+    final constants = functions.map(generateUrlConstant).join('\n');
 
     return constants;
   }
 
+  static String generateUrlConstant(FunctionDef func) {
+    final constName = FileWriter.toLowerCamelCase(func.name);
+    return "  static const String _$constName = '${func.api}';";
+  }
+
   static String _generateRequestMethods(List<FunctionDef> functions) {
-    final methods = functions
-        .map((func) {
-          final constName = FileWriter.toLowerCamelCase(func.name);
-          final responseType = ModelGenerator.getResponseModelType(func);
-          final requestType = ModelGenerator.getRequestModelType(func);
-          final hasRequest = func.request != null;
-
-          String params = '';
-          if (hasRequest) {
-            // Default value is false (Body)
-            final useQuery = func.query ?? false;
-            final annotation = useQuery ? '@Queries()' : '@Body()';
-            params = '$annotation $requestType request';
-          }
-
-          return '''  @${func.method}(_$constName)
-  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}($params);''';
-        })
-        .join('\n\n  ');
+    final methods = functions.map(generateRequestMethod).join('\n\n  ');
 
     return methods;
+  }
+
+  static String generateRequestMethod(FunctionDef func) {
+    final constName = FileWriter.toLowerCamelCase(func.name);
+    final responseType = ModelGenerator.getResponseModelType(func);
+    final requestType = ModelGenerator.getRequestModelType(func);
+    final hasRequest = func.request != null;
+
+    String params = '';
+    if (hasRequest) {
+      // Default value is false (Body)
+      final useQuery = func.query ?? false;
+      final annotation = useQuery ? '@Queries()' : '@Body()';
+      params = '$annotation $requestType request';
+    }
+
+    return '''  @${func.method}(_$constName)
+  Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}($params);''';
   }
 
   static String _generateModelImports(List<FunctionDef> functions) {
     final imports = <String>{};
     for (final f in functions) {
-      if (f.request != null && !ModelGenerator.isMagic(f.request)) {
-        imports.add(
-          "import '../models/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';",
-        );
-      }
-      if (f.response != null && !ModelGenerator.isMagic(f.response)) {
-        imports.add(
-          "import '../models/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';",
-        );
-      }
+      imports.addAll(generateSingleFunctionModelImports(f));
     }
     final sortedImports = imports.toList()..sort();
     return sortedImports.join('\n');
+  }
+
+  static Set<String> generateSingleFunctionModelImports(FunctionDef f) {
+    final imports = <String>{};
+    if (f.request != null && !ModelGenerator.isMagic(f.request)) {
+      imports.add(
+        "import '../models/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';",
+      );
+    }
+    if (f.response != null && !ModelGenerator.isMagic(f.response)) {
+      imports.add(
+        "import '../models/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';",
+      );
+    }
+    return imports;
   }
 }

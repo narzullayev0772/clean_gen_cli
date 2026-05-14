@@ -14,17 +14,20 @@ class DomainLayerGenerator {
   Future<void> generate({
     required String basePath,
     required FeatureSchema schema,
+    bool updateOnly = false,
   }) async {
     try {
       final domainPath = p.join(basePath, 'domain');
 
-      // Generate Repository interface
-      await _generateRepositoryInterface(domainPath, schema);
+      // Generate/Update Repository interface
+      await _generateRepositoryInterface(domainPath, schema, updateOnly);
 
-      // Generate UseCases
-      await _generateUseCases(domainPath, schema);
+      // Generate/Update UseCases
+      await _generateUseCases(domainPath, schema, updateOnly);
 
-      logger.info('✓ Domain layer generated for ${schema.name}');
+      logger.info(
+        '✓ Domain layer ${updateOnly ? 'updated' : 'generated'} for ${schema.name}',
+      );
     } catch (e) {
       logger.err('Failed to generate domain layer: $e');
       rethrow;
@@ -34,33 +37,62 @@ class DomainLayerGenerator {
   Future<void> _generateRepositoryInterface(
     String domainPath,
     FeatureSchema schema,
+    bool updateOnly,
   ) async {
     final snakeName = FileWriter.toSnakeCase(schema.name);
     final repoPath = p.join(domainPath, 'repositories');
+    final fileName = '${snakeName}_repository.dart';
+    final filePath = p.join(repoPath, fileName);
 
-    final content = RepositoryTemplate.generate(schema);
+    if (updateOnly && File(filePath).existsSync()) {
+      final existingContent = await File(filePath).readAsString();
+      for (final function in schema.functions) {
+        if (!existingContent.contains('${function.name}(')) {
+          final newMethod = RepositoryTemplate.generateMethod(function);
+          await FileWriter.injectToClass(
+            filePath: filePath,
+            newContent: newMethod,
+          );
 
-    await FileWriter.createDartFile(
-      dirPath: repoPath,
-      fileName: '${snakeName}_repository.dart',
-      content: content,
-    );
+          final imports = generateSingleFunctionModelImports(
+            function,
+            '../../data/models',
+          );
+          for (final imp in imports) {
+            await FileWriter.injectTopLevel(filePath: filePath, newContent: imp);
+          }
+        }
+      }
+    } else {
+      final content = RepositoryTemplate.generate(schema);
+      await FileWriter.createDartFile(
+        dirPath: repoPath,
+        fileName: fileName,
+        content: content,
+      );
+    }
   }
 
   Future<void> _generateUseCases(
     String domainPath,
     FeatureSchema schema,
+    bool updateOnly,
   ) async {
     final useCasesPath = p.join(domainPath, 'use_cases');
 
     for (final function in schema.functions) {
       final snakeName = FileWriter.toSnakeCase(function.name);
+      final fileName = '${snakeName}_use_case.dart';
+      final filePath = p.join(useCasesPath, fileName);
+
+      if (updateOnly && File(filePath).existsSync()) {
+        continue; // Skip existing UseCases
+      }
 
       final content = UseCaseTemplate.generate(function, schema);
-
       await FileWriter.createDartFile(
         dirPath: useCasesPath,
-        fileName: '${snakeName}_use_case.dart',
+        fileName: fileName,
         content: content,
       );
     }
