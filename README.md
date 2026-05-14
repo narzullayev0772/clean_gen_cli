@@ -10,6 +10,7 @@ A powerful command-line tool for Flutter developers to automate the generation o
 - ⚙️ **Config-Driven**: Uses simple JSON or YAML files to define feature requirements.
 - 🛠️ **Customizable**: Supports global and feature-specific configurations for imports and utility paths.
 - 🔄 **Smart Model Handling**: Supports manual models, serialized models, or fully generated models based on example payloads.
+- 🛠️ **Incremental Updates**: Use the `update` command to add new API endpoints to existing features without losing your manual code changes.
 
 ## Installation
 
