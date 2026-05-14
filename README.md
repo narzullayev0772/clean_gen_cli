@@ -95,6 +95,17 @@ clean_gen update <config-file> [options]
 - `-o, --output`: Set the output directory where the feature exists.
 - `-m, --model`: Model generation strategy for new models.
 
+### `test`
+Tests the API endpoints defined in your configuration file against a live server. It validates status codes and ensures the response structure matches your examples.
+```bash
+clean_gen test <config-file> --base-url <url> [options]
+```
+
+**Options:**
+- `-b, --base-url`: The root URL of your API (Required).
+- `-t, --token`: Bearer token for authentication.
+- `-H, --header`: Additional headers (e.g., `-H "X-Custom: Value"`).
+
 ### `version`
 Prints the current version of the CLI.
 

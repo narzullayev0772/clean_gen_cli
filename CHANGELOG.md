@@ -1,3 +1,9 @@
+## 1.4.0
+
+- **New Command**: Added `test` command to validate API endpoints against a live server.
+- **Contract Validation**: The `test` command compares the real server response with the examples provided in your config.
+- **Headers Support**: Support for Bearer tokens and custom headers in the `test` command.
+
 ## 1.3.1
 
 - **Maintenance**: Finalized formatting and documentation improvements.

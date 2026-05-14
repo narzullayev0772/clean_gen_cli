@@ -1,6 +1,7 @@
 import 'package:args/command_runner.dart';
 import 'package:clean_gen_cli/cli/commands/create_command.dart';
 import 'package:clean_gen_cli/cli/commands/init_command.dart';
+import 'package:clean_gen_cli/cli/commands/test_command.dart';
 import 'package:clean_gen_cli/cli/commands/update_command.dart';
 import 'package:clean_gen_cli/cli/commands/version_command.dart';
 import 'package:mason_logger/mason_logger.dart';
@@ -28,6 +29,7 @@ class CleanGenCommandRunner extends CommandRunner<void> {
 
     addCommand(CreateCommand(logger: _logger));
     addCommand(UpdateCommand(logger: _logger));
+    addCommand(TestCommand(logger: _logger));
     addCommand(InitCommand(logger: _logger));
     addCommand(VersionCommand(logger: _logger));
   }
