@@ -1,2 +1,114 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+# Clean Gen CLI
+
+A powerful command-line tool for Flutter developers to automate the generation of Clean Architecture features. Define your feature structure, API endpoints, and data models in JSON or YAML, and let `clean_gen` handle the boilerplate.
+
+## Features
+
+- 🏗️ **Clean Architecture Structure**: Automatically generates `data`, `domain`, and `presentation` layers.
+- 📂 **Standardized Folder Structure**: Creates folders for `data_sources`, `models`, `repositories`, `use_cases`, `cubits`, `pages`, and `widgets`.
+- 🚀 **Boilerplate Generation**: Generates API services (compatible with Chopper/Retrofit patterns), Repositories, Use Cases, and Models.
+- ⚙️ **Config-Driven**: Uses simple JSON or YAML files to define feature requirements.
+- 🛠️ **Customizable**: Supports global and feature-specific configurations for imports and utility paths.
+- 🔄 **Smart Model Handling**: Supports manual models, serialized models, or fully generated models based on example payloads.
+
+## Installation
+
+Activate the CLI globally using Dart:
+
+```bash
+dart pub global activate clean_gen_cli
+```
+
+## Getting Started
+
+### 1. Initialize Global Configuration
+
+Before creating features, it's recommended to initialize a global configuration file to define common imports (like your `DataState`, `UseCase` base classes, or `ServiceLocator`).
+
+```bash
+clean_gen init
+```
+
+This will create a `config/config.json` file. Update it to match your project's core utility paths.
+
+### 2. Create a Feature Configuration
+
+Create a configuration file for your feature (e.g., `auth.config.json`):
+
+```json
+{
+  "name": "auth",
+  "functions": [
+    {
+      "name": "signIn",
+      "api": "/api/v1/auth/login",
+      "method": "POST",
+      "request": {
+        "email": "string",
+        "password": "string"
+      },
+      "response": {
+        "token": "string",
+        "user": "$UserModel"
+      }
+    }
+  ]
+}
+```
+
+### 3. Generate the Feature
+
+Run the `create` command pointing to your config file:
+
+```bash
+clean_gen create config/auth.config.json
+```
+
+By default, this will generate the feature in `lib/src/features/auth`.
+
+## Commands
+
+### `init`
+Initializes the global configuration file.
+```bash
+clean_gen init [path/to/config.json]
+```
+
+### `create`
+Generates a feature based on a config file.
+```bash
+clean_gen create <config-file> [options]
+```
+
+**Options:**
+- `-o, --output`: Set the output directory (default: `lib/src/features`).
+- `-m, --model`: Model generation strategy: `empty`, `serialize`, or `generate` (default: `generate`).
+
+### `version`
+Prints the current version of the CLI.
+
+## Configuration Guide
+
+### Feature Config (`<name>.config.json`)
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `name` | String | The name of the feature (required). |
+| `functions` | List | API methods to generate (DataSources, Repositories, UseCases). |
+| `imports` | Object | Override global imports for this specific feature. |
+
+### Function Definition
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `name` | String | Method name (e.g., `getUserProfile`). |
+| `api` | String | API endpoint path. |
+| `method` | String | HTTP method: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`. |
+| `pagination`| Boolean| Whether the endpoint supports pagination. |
+| `query` | Boolean| If `true`, parameters are passed as Query params. |
+| `request` | Object/String| Example payload or magic model (e.g., `$MyModel`). |
+| `response` | Object/String| Example response or magic model. |
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

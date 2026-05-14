@@ -1,0 +1,73 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  publish:
+    permissions:
+      id-token: write # Required for OIDC authentication
+      contents: write # Required to push version bump back to repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for proper versioning/tagging
+
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Increment Version
+        id: bump_version
+        run: |
+          # Extract current version
+          VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+          echo "Current version: $VERSION"
+          
+          # Split version into components
+          IFS='.' read -ra ADDR <<< "$VERSION"
+          MAJOR=${ADDR[0]}
+          MINOR=${ADDR[1]}
+          PATCH=${ADDR[2]}
+          
+          # Increment patch
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          echo "New version: $NEW_VERSION"
+          
+          # Update pubspec.yaml
+          sed -i "s/version: $VERSION/version: $NEW_VERSION/" pubspec.yaml
+          
+          # Update lib/version.dart
+          if [ -f "lib/version.dart" ]; then
+            echo "Updating lib/version.dart"
+            echo "// Generated package version constant. Keep in sync with pubspec.yaml." > lib/version.dart
+            echo "const String packageVersion = '$NEW_VERSION';" >> lib/version.dart
+          fi
+          
+          # Update CHANGELOG.md
+          DATE=$(date +%Y-%m-%d)
+          TEMP_CHANGELOG=$(mktemp)
+          echo -e "## $NEW_VERSION\n\n- Automatic release on push to main ($DATE)\n\n$(cat CHANGELOG.md)" > "$TEMP_CHANGELOG"
+          mv "$TEMP_CHANGELOG" CHANGELOG.md
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml lib/version.dart CHANGELOG.md
+          git commit -m "chore: bump version to ${{ steps.bump_version.outputs.new_version }} [skip ci]"
+          git push
+
+      - name: Verify publishing eligibility
+        run: dart pub publish --dry-run
+
+      - name: Publish to pub.dev
+        run: dart pub publish --force
