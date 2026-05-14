@@ -1,3 +1,7 @@
+## ..1
+
+- Automatic release on push to main (2026-05-14)
+
 ## 1.0.4
 
 - Improved CLI documentation and help messages.
