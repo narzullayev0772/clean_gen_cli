@@ -1,14 +1,6 @@
-## 1.1.3
+## 1.3.1
 
-- Automatic release on push to main (2026-05-14)
-
-## 1.1.2
-
-- Automatic release on push to main (2026-05-14)
-
-## 1.1.1
-
-- Automatic release on push to main (2026-05-14)
+- **Maintenance**: Finalized formatting and documentation improvements.
 
 ## 1.3.0
 
