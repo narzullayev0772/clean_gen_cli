@@ -43,15 +43,9 @@ class FeatureGenerator {
         modelStrategy: modelStrategy,
       );
 
-      await _domainLayer.generate(
-        basePath: basePath,
-        schema: schema,
-      );
+      await _domainLayer.generate(basePath: basePath, schema: schema);
 
-      await _presentationLayer.generate(
-        basePath: basePath,
-        schema: schema,
-      );
+      await _presentationLayer.generate(basePath: basePath, schema: schema);
 
       // Generate DI file
       await _generateDI(basePath, schema);
@@ -88,10 +82,7 @@ class FeatureGenerator {
     }
   }
 
-  Future<void> _generateDI(
-    String basePath,
-    FeatureSchema schema,
-  ) async {
+  Future<void> _generateDI(String basePath, FeatureSchema schema) async {
     final snakeName = FileWriter.toSnakeCase(schema.name);
     final diFileName = '${snakeName}_di.dart';
 
@@ -123,24 +114,29 @@ class FeatureGenerator {
   Future<void> _runBuildRunner(String basePath) async {
     final projectRoot = _findProjectRoot(basePath);
     if (projectRoot == null) {
-      logger.warn('Could not find project root (pubspec.yaml). Skipping build_runner.');
+      logger.warn(
+        'Could not find project root (pubspec.yaml). Skipping build_runner.',
+      );
       return;
     }
 
     final pubspecFile = File(p.join(projectRoot, 'pubspec.yaml'));
     final pubspecContent = await pubspecFile.readAsString();
     if (!pubspecContent.contains('build_runner')) {
-      logger.warn('build_runner not found in pubspec.yaml. Skipping generation.');
+      logger.warn(
+        'build_runner not found in pubspec.yaml. Skipping generation.',
+      );
       return;
     }
 
     final progress = logger.progress('Running build_runner...');
     try {
-      final result = await Process.run(
-        'dart',
-        ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
-        workingDirectory: projectRoot,
-      );
+      final result = await Process.run('dart', [
+        'run',
+        'build_runner',
+        'build',
+        '--delete-conflicting-outputs',
+      ], workingDirectory: projectRoot);
 
       if (result.exitCode == 0) {
         progress.complete('Build runner completed');
@@ -166,4 +162,3 @@ class FeatureGenerator {
     return null;
   }
 }
-

@@ -92,8 +92,12 @@ class CreateCommand extends Command<void> {
       // Validate schema
       if (!schema.isValid()) {
         progress.fail('Invalid schema in $configPath');
-        _logger.err('Please ensure "name" is not empty and all "functions" have a "name" and "api".');
-        _logger.err('Valid methods are: ${FunctionDef.validMethods.join(', ')}');
+        _logger.err(
+          'Please ensure "name" is not empty and all "functions" have a "name" and "api".',
+        );
+        _logger.err(
+          'Valid methods are: ${FunctionDef.validMethods.join(', ')}',
+        );
         return;
       }
 
@@ -104,7 +108,11 @@ class CreateCommand extends Command<void> {
       final featureOutputPath = p.join(outputPath, featureName);
 
       // Create feature directory structure
-      await _initializeFeature(featureOutputPath, featureName, schema.functions.isNotEmpty);
+      await _initializeFeature(
+        featureOutputPath,
+        featureName,
+        schema.functions.isNotEmpty,
+      );
 
       // If functions exist, generate all files
       if (schema.functions.isNotEmpty) {
@@ -174,7 +182,11 @@ class CreateCommand extends Command<void> {
     }
   }
 
-  Future<void> _initializeFeature(String basePath, String featureName, bool hasFunctions) async {
+  Future<void> _initializeFeature(
+    String basePath,
+    String featureName,
+    bool hasFunctions,
+  ) async {
     final progress = _logger.progress('Initializing architecture...');
 
     try {
@@ -234,12 +246,20 @@ class CreateCommand extends Command<void> {
   // feature (do not rely on a generated .arch.json). If you want to persist
   // state inside the feature folder, add files manually after generation.
 
-  Future<void> _generateFeatureFiles(String basePath, FeatureSchema schema, String modelStrategy) async {
+  Future<void> _generateFeatureFiles(
+    String basePath,
+    FeatureSchema schema,
+    String modelStrategy,
+  ) async {
     final progress = _logger.progress('Generating feature files...');
 
     try {
       final generator = FeatureGenerator(logger: _logger);
-      await generator.generate(basePath: basePath, schema: schema, modelStrategy: modelStrategy);
+      await generator.generate(
+        basePath: basePath,
+        schema: schema,
+        modelStrategy: modelStrategy,
+      );
       progress.complete('Feature files generated');
     } catch (e) {
       progress.fail('Failed to generate files: $e');
@@ -247,4 +267,3 @@ class CreateCommand extends Command<void> {
     }
   }
 }
-

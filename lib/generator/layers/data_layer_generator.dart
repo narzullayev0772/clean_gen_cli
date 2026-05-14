@@ -61,9 +61,13 @@ class DataLayerGenerator {
     for (final function in schema.functions) {
       // Generate request model
       if (function.request != null) {
-        final requestModel = ModelGenerator.generateRequestModel(function, strategy: modelStrategy);
+        final requestModel = ModelGenerator.generateRequestModel(
+          function,
+          strategy: modelStrategy,
+        );
         if (requestModel.isNotEmpty) {
-          final fileName = '${FileWriter.toSnakeCase(function.name)}_request.dart';
+          final fileName =
+              '${FileWriter.toSnakeCase(function.name)}_request.dart';
           await FileWriter.createDartFile(
             dirPath: requestsPath,
             fileName: fileName,
@@ -74,9 +78,13 @@ class DataLayerGenerator {
 
       // Generate response model
       if (function.response != null) {
-        final responseModel = ModelGenerator.generateResponseModel(function, strategy: modelStrategy);
+        final responseModel = ModelGenerator.generateResponseModel(
+          function,
+          strategy: modelStrategy,
+        );
         if (responseModel.isNotEmpty) {
-          final fileName = '${FileWriter.toSnakeCase(function.name)}_model.dart';
+          final fileName =
+              '${FileWriter.toSnakeCase(function.name)}_model.dart';
           await FileWriter.createDartFile(
             dirPath: responsesPath,
             fileName: fileName,
@@ -102,4 +110,3 @@ class DataLayerGenerator {
     );
   }
 }
-

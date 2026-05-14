@@ -4,20 +4,31 @@ import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 
 class RepositoryTemplate {
   static String generate(FeatureSchema schema) {
-    final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(schema.name));
+    final camelName = FileWriter.toCamelCase(
+      FileWriter.toSnakeCase(schema.name),
+    );
     final className = '${camelName}Repository';
 
-    final methods = schema.functions.map((f) {
-      final methodName = f.name;
-      final requestType = ModelGenerator.getRequestModelType(f);
-      final responseType = ModelGenerator.getResponseModelType(f);
-      final returnType = responseType == 'dynamic' ? 'dynamic' : '$responseType?';
-      return '  Future<DataState<$returnType>> $methodName($requestType params);';
-    }).join('\n');
+    final methods = schema.functions
+        .map((f) {
+          final methodName = f.name;
+          final requestType = ModelGenerator.getRequestModelType(f);
+          final responseType = ModelGenerator.getResponseModelType(f);
+          final returnType = responseType == 'dynamic'
+              ? 'dynamic'
+              : '$responseType?';
+          return '  Future<DataState<$returnType>> $methodName($requestType params);';
+        })
+        .join('\n');
 
-    final modelImports = _generateModelImports(schema.functions, '../../data/models');
+    final modelImports = _generateModelImports(
+      schema.functions,
+      '../../data/models',
+    );
     final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
-    final dataStateImportLine = dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
+    final dataStateImportLine = dataStateImport.isNotEmpty
+        ? "import '$dataStateImport';"
+        : "";
 
     return '''$dataStateImportLine
 $modelImports
@@ -31,33 +42,43 @@ $methods
 
 class RepositoryImplTemplate {
   static String generate(FeatureSchema schema) {
-    final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(schema.name));
+    final camelName = FileWriter.toCamelCase(
+      FileWriter.toSnakeCase(schema.name),
+    );
     final className = '${camelName}Repository';
     final implClassName = '${className}Impl';
     final apiServiceName = '${camelName}ApiService';
     final snakeName = FileWriter.toSnakeCase(schema.name);
 
-    final methods = schema.functions.map((f) {
-      final methodName = f.name;
-      final requestType = ModelGenerator.getRequestModelType(f);
-      var responseType = ModelGenerator.getResponseModelType(f);
-      final hasRequest = f.request != null;
+    final methods = schema.functions
+        .map((f) {
+          final methodName = f.name;
+          final requestType = ModelGenerator.getRequestModelType(f);
+          var responseType = ModelGenerator.getResponseModelType(f);
+          final hasRequest = f.request != null;
 
-      final returnType = responseType == 'dynamic' ? 'dynamic' : '$responseType?';
+          final returnType = responseType == 'dynamic'
+              ? 'dynamic'
+              : '$responseType?';
 
-      return '''
+          return '''
   @override
   Future<DataState<$returnType>> $methodName($requestType params) async =>
       await handleResponse(response: _apiService.$methodName(${hasRequest ? 'params' : ''}));''';
-    }).join('\n');
+        })
+        .join('\n');
 
     final modelImports = _generateModelImports(schema.functions, '../models');
-    
+
     final baseRepoImport = schema.globalConfig.imports['base_repository'] ?? '';
-    final baseRepoImportLine = baseRepoImport.isNotEmpty ? "import '$baseRepoImport';" : "";
-    
+    final baseRepoImportLine = baseRepoImport.isNotEmpty
+        ? "import '$baseRepoImport';"
+        : "";
+
     final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
-    final dataStateImportLine = dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
+    final dataStateImportLine = dataStateImport.isNotEmpty
+        ? "import '$dataStateImport';"
+        : "";
 
     return '''import '../data_sources/${snakeName}_api_service.dart';
 import '../../domain/repositories/${snakeName}_repository.dart';
@@ -80,10 +101,14 @@ String _generateModelImports(List<FunctionDef> functions, String relativePath) {
   final imports = <String>{};
   for (final f in functions) {
     if (f.request != null && !ModelGenerator.isMagic(f.request)) {
-      imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
+      imports.add(
+        "import '$relativePath/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';",
+      );
     }
     if (f.response != null && !ModelGenerator.isMagic(f.response)) {
-      imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
+      imports.add(
+        "import '$relativePath/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';",
+      );
     }
   }
   final sortedImports = imports.toList()..sort();

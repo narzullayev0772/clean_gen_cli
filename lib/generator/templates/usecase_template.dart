@@ -5,7 +5,9 @@ import 'package:clean_gen_cli/generator/utils/model_generator.dart';
 class UseCaseTemplate {
   static String generate(FunctionDef function, FeatureSchema schema) {
     final featureName = schema.name;
-    final camelFeatureName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
+    final camelFeatureName = FileWriter.toCamelCase(
+      FileWriter.toSnakeCase(featureName),
+    );
     final className = '${FileWriter.toCamelCase(function.name)}UseCase';
     final repoName = '${camelFeatureName}Repository';
     final requestType = ModelGenerator.getRequestModelType(function);
@@ -14,10 +16,14 @@ class UseCaseTemplate {
     final modelImports = _generateModelImports(function, '../../data/models');
 
     final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
-    final dataStateImportLine = dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
-    
+    final dataStateImportLine = dataStateImport.isNotEmpty
+        ? "import '$dataStateImport';"
+        : "";
+
     final useCaseImport = schema.globalConfig.imports['use_case'] ?? '';
-    final useCaseImportLine = useCaseImport.isNotEmpty ? "import '$useCaseImport';" : "";
+    final useCaseImportLine = useCaseImport.isNotEmpty
+        ? "import '$useCaseImport';"
+        : "";
 
     return '''import '../repositories/${FileWriter.toSnakeCase(featureName)}_repository.dart';
 $dataStateImportLine
@@ -36,13 +42,21 @@ class $className implements UseCase<DataState<$returnType>, $requestType> {
 ''';
   }
 
-  static String _generateModelImports(FunctionDef function, String relativePath) {
+  static String _generateModelImports(
+    FunctionDef function,
+    String relativePath,
+  ) {
     final imports = <String>{};
     if (function.request != null && !ModelGenerator.isMagic(function.request)) {
-      imports.add("import '$relativePath/requests/${FileWriter.toSnakeCase(function.name)}_request.dart';");
+      imports.add(
+        "import '$relativePath/requests/${FileWriter.toSnakeCase(function.name)}_request.dart';",
+      );
     }
-    if (function.response != null && !ModelGenerator.isMagic(function.response)) {
-      imports.add("import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';");
+    if (function.response != null &&
+        !ModelGenerator.isMagic(function.response)) {
+      imports.add(
+        "import '$relativePath/responses/${FileWriter.toSnakeCase(function.name)}_model.dart';",
+      );
     }
     final sortedImports = imports.toList()..sort();
     return sortedImports.join('\n');

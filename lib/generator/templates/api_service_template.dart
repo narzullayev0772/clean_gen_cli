@@ -6,15 +6,20 @@ class ApiServiceTemplate {
   static String generate(FeatureSchema schema) {
     final featureName = schema.name;
     final functions = schema.functions;
-    final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(featureName));
+    final camelName = FileWriter.toCamelCase(
+      FileWriter.toSnakeCase(featureName),
+    );
     final className = '${camelName}ApiService';
 
     final urlConstants = _generateUrlConstants(functions);
     final requestMethods = _generateRequestMethods(functions);
     final modelImports = _generateModelImports(functions);
 
-    final baseResponseImport = schema.globalConfig.imports['base_response'] ?? '';
-    final baseResponseImportLine = baseResponseImport.isNotEmpty ? "import '$baseResponseImport';" : "";
+    final baseResponseImport =
+        schema.globalConfig.imports['base_response'] ?? '';
+    final baseResponseImportLine = baseResponseImport.isNotEmpty
+        ? "import '$baseResponseImport';"
+        : "";
 
     return '''import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
@@ -37,32 +42,36 @@ $requestMethods
   }
 
   static String _generateUrlConstants(List<FunctionDef> functions) {
-    final constants = functions.map((func) {
-      final constName = FileWriter.toLowerCamelCase(func.name);
-      return "  static const String _$constName = '${func.api}';";
-    }).join('\n');
+    final constants = functions
+        .map((func) {
+          final constName = FileWriter.toLowerCamelCase(func.name);
+          return "  static const String _$constName = '${func.api}';";
+        })
+        .join('\n');
 
     return constants;
   }
 
   static String _generateRequestMethods(List<FunctionDef> functions) {
-    final methods = functions.map((func) {
-      final constName = FileWriter.toLowerCamelCase(func.name);
-      final responseType = ModelGenerator.getResponseModelType(func);
-      final requestType = ModelGenerator.getRequestModelType(func);
-      final hasRequest = func.request != null;
+    final methods = functions
+        .map((func) {
+          final constName = FileWriter.toLowerCamelCase(func.name);
+          final responseType = ModelGenerator.getResponseModelType(func);
+          final requestType = ModelGenerator.getRequestModelType(func);
+          final hasRequest = func.request != null;
 
-      String params = '';
-      if (hasRequest) {
-        // Default value is false (Body)
-        final useQuery = func.query ?? false;
-        final annotation = useQuery ? '@Queries()' : '@Body()';
-        params = '$annotation $requestType request';
-      }
+          String params = '';
+          if (hasRequest) {
+            // Default value is false (Body)
+            final useQuery = func.query ?? false;
+            final annotation = useQuery ? '@Queries()' : '@Body()';
+            params = '$annotation $requestType request';
+          }
 
-      return '''  @${func.method}(_$constName)
+          return '''  @${func.method}(_$constName)
   Future<HttpResponse<BaseResponse<$responseType>>> ${func.name}($params);''';
-    }).join('\n\n  ');
+        })
+        .join('\n\n  ');
 
     return methods;
   }
@@ -71,10 +80,14 @@ $requestMethods
     final imports = <String>{};
     for (final f in functions) {
       if (f.request != null && !ModelGenerator.isMagic(f.request)) {
-        imports.add("import '../models/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';");
+        imports.add(
+          "import '../models/requests/${FileWriter.toSnakeCase(f.name)}_request.dart';",
+        );
       }
       if (f.response != null && !ModelGenerator.isMagic(f.response)) {
-        imports.add("import '../models/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';");
+        imports.add(
+          "import '../models/responses/${FileWriter.toSnakeCase(f.name)}_model.dart';",
+        );
       }
     }
     final sortedImports = imports.toList()..sort();

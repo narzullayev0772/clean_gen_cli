@@ -31,4 +31,3 @@ class FileWriter {
 
   static String toConstName(String input) => ReCase(input).constantCase;
 }
-

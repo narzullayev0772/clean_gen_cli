@@ -3,21 +3,42 @@ import 'package:clean_gen_cli/generator/utils/file_writer.dart';
 
 class DITemplate {
   static String generate(FeatureSchema schema) {
-    final camelName = FileWriter.toCamelCase(FileWriter.toSnakeCase(schema.name));
+    final camelName = FileWriter.toCamelCase(
+      FileWriter.toSnakeCase(schema.name),
+    );
     final snakeName = FileWriter.toSnakeCase(schema.name);
     final functionName = '${FileWriter.toLowerCamelCase(schema.name)}DI';
 
     final locatorName = schema.globalConfig.config['locator_name'] ?? 'locator';
     final locatorImport = schema.globalConfig.imports['locator'] ?? '';
-    final locatorImportLine = locatorImport.isNotEmpty ? "import '$locatorImport';" : "";
+    final locatorImportLine = locatorImport.isNotEmpty
+        ? "import '$locatorImport';"
+        : "";
 
-    final apiServiceRegistration = _generateApiServiceRegistration(camelName, locatorName);
-    final repositoryRegistration = _generateRepositoryRegistration(camelName, locatorName);
-    final useCaseRegistrations = _generateUseCaseRegistrations(schema.functions, camelName, locatorName);
-    final cubitsRegistration = _generateCubitsRegistration(schema.functions, camelName, locatorName);
+    final apiServiceRegistration = _generateApiServiceRegistration(
+      camelName,
+      locatorName,
+    );
+    final repositoryRegistration = _generateRepositoryRegistration(
+      camelName,
+      locatorName,
+    );
+    final useCaseRegistrations = _generateUseCaseRegistrations(
+      schema.functions,
+      camelName,
+      locatorName,
+    );
+    final cubitsRegistration = _generateCubitsRegistration(
+      schema.functions,
+      camelName,
+      locatorName,
+    );
 
     final useCaseImports = schema.functions
-        .map((f) => "import 'domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';")
+        .map(
+          (f) =>
+              "import 'domain/use_cases/${FileWriter.toSnakeCase(f.name)}_use_case.dart';",
+        )
         .join('\n');
 
     return '''$locatorImportLine
@@ -43,32 +64,47 @@ $cubitsRegistration
 ''';
   }
 
-  static String _generateApiServiceRegistration(String camelName, String locatorName) {
+  static String _generateApiServiceRegistration(
+    String camelName,
+    String locatorName,
+  ) {
     return '  $locatorName.registerSingleton(${camelName}ApiService($locatorName()));';
   }
 
-  static String _generateRepositoryRegistration(String camelName, String locatorName) {
+  static String _generateRepositoryRegistration(
+    String camelName,
+    String locatorName,
+  ) {
     return '''  $locatorName.registerSingleton<${camelName}Repository>(
     ${camelName}RepositoryImpl($locatorName()),
   );''';
   }
 
-  static String _generateUseCaseRegistrations(List<FunctionDef> functions, String camelName, String locatorName) {
+  static String _generateUseCaseRegistrations(
+    List<FunctionDef> functions,
+    String camelName,
+    String locatorName,
+  ) {
     if (functions.isEmpty) {
       return '  // Add your use case registrations here';
     }
 
     final registrations = functions
-        .map((f) => "  $locatorName.registerSingleton(${FileWriter.toCamelCase(f.name)}UseCase($locatorName()));")
+        .map(
+          (f) =>
+              "  $locatorName.registerSingleton(${FileWriter.toCamelCase(f.name)}UseCase($locatorName()));",
+        )
         .join('\n');
 
     return registrations;
   }
 
-  static String _generateCubitsRegistration(List<FunctionDef> functions, String camelName, String locatorName) {
-    final useCases = functions
-        .map((f) => "$locatorName()")
-        .join(',\n      ');
+  static String _generateCubitsRegistration(
+    List<FunctionDef> functions,
+    String camelName,
+    String locatorName,
+  ) {
+    final useCases = functions.map((f) => "$locatorName()").join(',\n      ');
 
     return '''  $locatorName.registerFactory<${camelName}Cubit>(
     () => ${camelName}Cubit(

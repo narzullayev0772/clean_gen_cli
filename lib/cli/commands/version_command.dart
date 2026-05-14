@@ -17,4 +17,3 @@ class VersionCommand extends Command<void> {
     _logger.info('clean_gen_cli $packageVersion');
   }
 }
-

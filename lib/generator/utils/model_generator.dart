@@ -15,7 +15,10 @@ class ModelGenerator {
   }
 
   /// Generate request model class from schema
-  static String generateRequestModel(FunctionDef function, {String strategy = 'empty'}) {
+  static String generateRequestModel(
+    FunctionDef function, {
+    String strategy = 'empty',
+  }) {
     if (function.request == null || isMagic(function.request)) {
       return '';
     }
@@ -27,7 +30,10 @@ class ModelGenerator {
   }
 
   /// Generate response model class from schema
-  static String generateResponseModel(FunctionDef function, {String strategy = 'empty'}) {
+  static String generateResponseModel(
+    FunctionDef function, {
+    String strategy = 'empty',
+  }) {
     if (function.response == null || isMagic(function.response)) {
       return '';
     }
@@ -43,7 +49,12 @@ class ModelGenerator {
     return _generateModel(modelName, fileName, responseData, strategy);
   }
 
-  static String _generateModel(String className, String fileName, dynamic data, String strategy) {
+  static String _generateModel(
+    String className,
+    String fileName,
+    dynamic data,
+    String strategy,
+  ) {
     if (strategy == 'serialize') {
       return _generateSerializableModel(className, fileName, data);
     } else if (strategy == 'generate') {
@@ -86,20 +97,28 @@ class $className {
       // fromJson assignment
       if (type.startsWith('List<')) {
         final inner = type.substring(5, type.length - 1);
-        if (_isPrimitive(inner) || inner == 'dynamic' || inner.startsWith('Map<')) {
+        if (_isPrimitive(inner) ||
+            inner == 'dynamic' ||
+            inner.startsWith('Map<')) {
           // primitive list: assign directly
           fromJsonAssignments.add("    $dartKey = json['$key'];");
         } else {
           // list of models: use foreach pattern for safety and readability
           needsCoreModelsImport = true;
-          fromJsonAssignments.add("    if (json['$key'] != null) {\n      $dartKey = [];\n      json['$key'].forEach((v) {\n        $dartKey?.add($inner.fromJson(v));\n      });\n    }");
+          fromJsonAssignments.add(
+            "    if (json['$key'] != null) {\n      $dartKey = [];\n      json['$key'].forEach((v) {\n        $dartKey?.add($inner.fromJson(v));\n      });\n    }",
+          );
         }
 
         // toJson for list
-        if (_isPrimitive(inner) || inner == 'dynamic' || inner.startsWith('Map<')) {
+        if (_isPrimitive(inner) ||
+            inner == 'dynamic' ||
+            inner.startsWith('Map<')) {
           toJsonLines.add("    map['$key'] = $dartKey;");
         } else {
-          toJsonLines.add("    if ($dartKey != null) {\n      map['$key'] = $dartKey?.map((e) => e.toJson()).toList();\n    }");
+          toJsonLines.add(
+            "    if ($dartKey != null) {\n      map['$key'] = $dartKey?.map((e) => e.toJson()).toList();\n    }",
+          );
         }
       } else if (type == 'Map<String, dynamic>') {
         // assign map directly
@@ -112,24 +131,34 @@ class $className {
       } else {
         // custom model
         needsCoreModelsImport = true;
-        fromJsonAssignments.add("    $dartKey = json['$key'] != null ? $type.fromJson(json['$key']) : null;");
-        toJsonLines.add("    if ($dartKey != null) {\n      map['$key'] = $dartKey?.toJson();\n    }");
+        fromJsonAssignments.add(
+          "    $dartKey = json['$key'] != null ? $type.fromJson(json['$key']) : null;",
+        );
+        toJsonLines.add(
+          "    if ($dartKey != null) {\n      map['$key'] = $dartKey?.toJson();\n    }",
+        );
       }
     });
 
     // copyWith params and assignments
-    final copyWithParams = data.entries.map((e) {
-      final dartKey = FileWriter.toLowerCamelCase(e.key.toString());
-      final type = _getDartType(e.value);
-      return '    $type? $dartKey,';
-    }).join('\n');
+    final copyWithParams = data.entries
+        .map((e) {
+          final dartKey = FileWriter.toLowerCamelCase(e.key.toString());
+          final type = _getDartType(e.value);
+          return '    $type? $dartKey,';
+        })
+        .join('\n');
 
-    final copyWithAssignments = data.keys.map((key) {
-      final dartKey = FileWriter.toLowerCamelCase(key.toString());
-      return '      $dartKey: $dartKey ?? this.$dartKey,';
-    }).join('\n');
+    final copyWithAssignments = data.keys
+        .map((key) {
+          final dartKey = FileWriter.toLowerCamelCase(key.toString());
+          return '      $dartKey: $dartKey ?? this.$dartKey,';
+        })
+        .join('\n');
 
-    final importLine = needsCoreModelsImport ? "import 'package:uyqur_core/core/models/models.dart';\n\n" : '';
+    final importLine = needsCoreModelsImport
+        ? "import 'package:uyqur_core/core/models/models.dart';\n\n"
+        : '';
 
     return '''${importLine}class $className {
 ${fields.join('\n')}
@@ -158,7 +187,11 @@ ${toJsonLines.join('\n')}
     ''';
   }
 
-  static String _generateSerializableModel(String className, String fileName, dynamic data) {
+  static String _generateSerializableModel(
+    String className,
+    String fileName,
+    dynamic data,
+  ) {
     if (data is! Map) return _generateEmptyModel(className, data);
 
     final fields = <String>[];
@@ -293,14 +326,18 @@ ${fields.join('\n')}
 
     if (obj is List) {
       if (obj.isEmpty) return '[]';
-      final items = obj.map((e) => _prettyJson(e, indent: indent + 2)).join(',\n$spaces');
+      final items = obj
+          .map((e) => _prettyJson(e, indent: indent + 2))
+          .join(',\n$spaces');
       return '[\n$spaces$items\n$spaces]';
     } else if (obj is Map) {
       if (obj.isEmpty) return '{}';
-      final entries = obj.entries.map((e) {
-        final value = _prettyJson(e.value, indent: indent + 2);
-        return '"${e.key}": $value';
-      }).join(',\n$spaces');
+      final entries = obj.entries
+          .map((e) {
+            final value = _prettyJson(e.value, indent: indent + 2);
+            return '"${e.key}": $value';
+          })
+          .join(',\n$spaces');
       return '{\n$spaces$entries\n$spaces}';
     } else if (obj is String) {
       return '"$obj"';

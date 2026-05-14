@@ -2,22 +2,24 @@ class GlobalConfig {
   final Map<String, String> imports;
   final Map<String, String> config;
 
-  GlobalConfig({
-    this.imports = const {},
-    this.config = const {},
-  });
+  GlobalConfig({this.imports = const {}, this.config = const {}});
 
   factory GlobalConfig.fromJson(Map<String, dynamic> json) {
     return GlobalConfig(
-      imports: (json['imports'] as Map<String, dynamic>?)?.map((k, v) => MapEntry(k, v.toString())) ?? {},
-      config: (json['config'] as Map<String, dynamic>?)?.map((k, v) => MapEntry(k, v.toString())) ?? {},
+      imports:
+          (json['imports'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, v.toString()),
+          ) ??
+          {},
+      config:
+          (json['config'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, v.toString()),
+          ) ??
+          {},
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'imports': imports,
-    'config': config,
-  };
+  Map<String, dynamic> toJson() => {'imports': imports, 'config': config};
 }
 
 class FeatureSchema {
@@ -31,8 +33,12 @@ class FeatureSchema {
     required this.globalConfig,
   });
 
-  factory FeatureSchema.fromJson(Map<String, dynamic> json, GlobalConfig global) {
-    final functions = (json['functions'] as List<dynamic>?)
+  factory FeatureSchema.fromJson(
+    Map<String, dynamic> json,
+    GlobalConfig global,
+  ) {
+    final functions =
+        (json['functions'] as List<dynamic>?)
             ?.map((f) => FunctionDef.fromJson(f as Map<String, dynamic>))
             .toList() ??
         [];
@@ -60,7 +66,13 @@ class FunctionDef {
   final bool pagination;
   final bool? query;
 
-  static const List<String> validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+  static const List<String> validMethods = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+  ];
 
   FunctionDef({
     required this.name,

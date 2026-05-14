@@ -16,7 +16,8 @@ class InitCommand extends Command<void> {
 
   @override
   Future<void> run() async {
-    final path = argResults?.rest.firstOrNull ?? p.join('config', 'config.json');
+    final path =
+        argResults?.rest.firstOrNull ?? p.join('config', 'config.json');
     final progress = _logger.progress('Initializing global config...');
 
     try {
@@ -38,12 +39,12 @@ class InitCommand extends Command<void> {
           'use_case': 'package:core/core.dart',
           'base_repository': 'package:core/core.dart',
           'base_response': 'package:core/resources/base_response.dart',
-          'locator': 'package:core/di/locator.dart'
+          'locator': 'package:core/di/locator.dart',
         },
         'config': {
           'fetcher_import': '../../../../core/utils/fetcher.dart',
-          'locator_name': 'locator'
-        }
+          'locator_name': 'locator',
+        },
       };
 
       await configFile.writeAsString(
