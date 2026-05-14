@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Automatic release on push to main (2026-05-14)
+
 ## 1.1.0
 
 - **New Command**: Added `update` command to incrementally add new functions to existing features.
