@@ -1,3 +1,7 @@
+## 1.1.3
+
+- Automatic release on push to main (2026-05-14)
+
 ## 1.1.2
 
 - Automatic release on push to main (2026-05-14)
