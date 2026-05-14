@@ -25,9 +25,14 @@ jobs:
       - name: Increment Version
         id: bump_version
         run: |
-          # Extract current version
-          VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+          # Extract current version (remove carriage returns and leading/trailing whitespace)
+          VERSION=$(grep '^version: ' pubspec.yaml | cut -d ':' -f 2 | tr -d '[:space:]')
           echo "Current version: $VERSION"
+          
+          if [ -z "$VERSION" ]; then
+            echo "Error: Could not find version in pubspec.yaml"
+            exit 1
+          fi
           
           # Split version into components
           IFS='.' read -ra ADDR <<< "$VERSION"
@@ -41,7 +46,7 @@ jobs:
           echo "New version: $NEW_VERSION"
           
           # Update pubspec.yaml
-          sed -i "s/version: $VERSION/version: $NEW_VERSION/" pubspec.yaml
+          sed -i "s/^version: .*/version: $NEW_VERSION/" pubspec.yaml
           
           # Update lib/version.dart
           if [ -f "lib/version.dart" ]; then
