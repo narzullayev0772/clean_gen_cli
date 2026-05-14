@@ -38,6 +38,12 @@ class TestCommand extends Command<void> {
       abbr: 'H',
       help: 'Additional headers in "key:value" format.',
     );
+    argParser.addFlag(
+      'verbose',
+      abbr: 'v',
+      negatable: false,
+      help: 'Show detailed request and response information.',
+    );
   }
 
   @override
@@ -51,6 +57,7 @@ class TestCommand extends Command<void> {
     final baseUrl = argResults!['base-url'] as String;
     final token = argResults?['token'] as String?;
     final headerList = argResults?['header'] as List<String>? ?? [];
+    final verbose = argResults?['verbose'] as bool? ?? false;
 
     final headers = <String, String>{
       'Content-Type': 'application/json',
@@ -68,13 +75,14 @@ class TestCommand extends Command<void> {
       }
     }
 
-    await _testConfig(configPath, baseUrl, headers);
+    await _testConfig(configPath, baseUrl, headers, verbose);
   }
 
   Future<void> _testConfig(
     String configPath,
     String baseUrl,
     Map<String, String> headers,
+    bool verbose,
   ) async {
     final progress = _logger.progress('Loading config...');
 
@@ -103,7 +111,7 @@ class TestCommand extends Command<void> {
       int failCount = 0;
 
       for (final func in schema.functions) {
-        final result = await _testFunction(func, baseUrl, headers);
+        final result = await _testFunction(func, baseUrl, headers, verbose);
         if (result) {
           successCount++;
         } else {
@@ -127,6 +135,7 @@ class TestCommand extends Command<void> {
     FunctionDef func,
     String baseUrl,
     Map<String, String> headers,
+    bool verbose,
   ) async {
     final funcProgress = _logger.progress(
       'Testing ${func.name} [${func.method}]',
@@ -148,6 +157,12 @@ class TestCommand extends Command<void> {
             )
           : url;
 
+      if (verbose) {
+        _logger.info('  ➡️ Sending ${func.method} to $queryUrl');
+        if (headers.isNotEmpty) _logger.info('  ➡️ Headers: $headers');
+        if (body != null) _logger.info('  ➡️ Body: $body');
+      }
+
       switch (func.method) {
         case 'GET':
           response = await http.get(queryUrl, headers: headers);
@@ -167,6 +182,11 @@ class TestCommand extends Command<void> {
         default:
           funcProgress.fail('Unsupported method: ${func.method}');
           return false;
+      }
+
+      if (verbose) {
+        _logger.info('  ⬅️ Received Status: ${response.statusCode}');
+        _logger.info('  ⬅️ Response: ${response.body}');
       }
 
       if (response.statusCode >= 200 && response.statusCode < 300) {

@@ -139,15 +139,20 @@ class CreateCommand extends Command<void> {
   }
 
   String _extractFeatureName(String fileName) {
-    // Remove .config.json or .config.yaml/yml extension
-    if (fileName.endsWith('.config.json')) {
-      return fileName.substring(0, fileName.length - '.config.json'.length);
-    }
-    if (fileName.endsWith('.config.yaml')) {
-      return fileName.substring(0, fileName.length - '.config.yaml'.length);
-    }
-    if (fileName.endsWith('.config.yml')) {
-      return fileName.substring(0, fileName.length - '.config.yml'.length);
+    // Remove .config.json or .config.yaml/yml extension or .test.json etc.
+    final extensions = [
+      '.config.json',
+      '.config.yaml',
+      '.config.yml',
+      '.test.json',
+      '.test.yaml',
+      '.test.yml',
+    ];
+
+    for (final ext in extensions) {
+      if (fileName.endsWith(ext)) {
+        return fileName.substring(0, fileName.length - ext.length);
+      }
     }
     return '';
   }

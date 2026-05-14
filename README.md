@@ -105,13 +105,15 @@ clean_gen test <config-file> --base-url <url> [options]
 - `-b, --base-url`: The root URL of your API (Required).
 - `-t, --token`: Bearer token for authentication.
 - `-H, --header`: Additional headers (e.g., `-H "X-Custom: Value"`).
+- `-v, --verbose`: Show detailed request and response information.
 
 ### `version`
 Prints the current version of the CLI.
 
 ## Configuration Guide
 
-### Feature Config (`<name>.config.json`)
+### Feature Config (`<name>.config.json` or `<name>.test.json`)
+The CLI recognizes files ending in `.config.json`, `.config.yaml`, `.test.json`, and `.test.yaml`. The filename prefix is used as the feature name.
 
 | Property | Type | Description |
 | --- | --- | --- |
