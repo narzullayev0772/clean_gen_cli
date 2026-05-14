@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:clean_gen_cli/generator/models/feature_schema.dart';

@@ -108,13 +108,32 @@ class FeatureGenerator {
       // Extract only the setup lines from the template
       final lines = template.split('\n');
       for (final line in lines) {
-        if ((line.contains('locator.registerLazySingleton') ||
-                line.contains('locator.registerFactory')) &&
-            !existingContent.contains(line.trim())) {
-          await FileWriter.injectToClass(
-            filePath: filePath,
-            newContent: line.trim(),
-          );
+        final trimmedLine = line.trim();
+        if ((trimmedLine.contains('locator.registerLazySingleton') ||
+                trimmedLine.contains('locator.registerSingleton') ||
+                trimmedLine.contains('locator.registerFactory')) &&
+            !existingContent.contains(trimmedLine)) {
+          // For Cubits, it's complex, we might want to skip auto-updating the Cubit factory
+          // or just append new lines if they are UseCase registrations
+          if (trimmedLine.contains('UseCase')) {
+            await FileWriter.injectToClass(
+              filePath: filePath,
+              newContent: trimmedLine,
+              anchor: '// Cubits',
+            );
+          }
+        }
+
+        // Handle imports
+        if (trimmedLine.startsWith('import ') &&
+            !existingContent.contains(trimmedLine)) {
+          // Only add imports for new UseCases
+          if (trimmedLine.contains('use_cases/')) {
+            await FileWriter.injectTopLevel(
+              filePath: filePath,
+              newContent: trimmedLine,
+            );
+          }
         }
       }
     } else {
