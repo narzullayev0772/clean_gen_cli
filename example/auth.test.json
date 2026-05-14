@@ -1,0 +1,47 @@
+{
+  "$schema": "../clean_gen_schema.json",
+  "name": "auth",
+  "functions": [
+    {
+      "name": "signIn",
+      "api": "/api/auth/sign-in",
+      "method": "POST",
+      "request": {
+        "email": "string",
+        "password": "string"
+      },
+      "response": {
+        "token": "string",
+        "user": "$UserModel"
+      }
+    },
+    {
+      "name": "signUp",
+      "api": "/api/auth/sign-up",
+      "method": "POST",
+      "request": {
+        "email": "string",
+        "password": "string",
+        "name": "string"
+      },
+      "response": {
+        "token": "string"
+      }
+    },
+    {
+      "name": "logout",
+      "api": "/api/auth/logout",
+      "method": "POST"
+    },
+    {
+      "name": "getUsersList",
+      "api": "/users/list",
+      "pagination": true,
+      "query": true,
+      "request": "$PaginationQueryModel",
+      "response": [
+        "$UserModel"
+      ]
+    }
+  ]
+}

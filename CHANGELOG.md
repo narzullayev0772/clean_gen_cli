@@ -1,3 +1,8 @@
+## 1.4.1
+
+- **Naming Support**: Added support for `.test.json` and `.test.yaml` naming conventions.
+- **Verbose Output**: Added `-v` / `--verbose` flag to the `test` command to show detailed request and response logs.
+
 ## 1.4.0
 
 - **New Command**: Added `test` command to validate API endpoints against a live server.

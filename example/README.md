@@ -5,6 +5,7 @@ This directory contains example configuration files that you can use with `clean
 ## Examples Included
 
 - `auth.config.json`: A comprehensive example for an authentication feature with sign in, sign up, logout, and user list functions.
+- `auth.test.json`: The same feature using the `.test.json` naming convention, ideal for API contract testing.
 - `auth.config.yaml`: The same authentication feature defined in YAML format.
 - `config.json`: A sample global configuration file to define shared imports and project-specific utility paths.
 
