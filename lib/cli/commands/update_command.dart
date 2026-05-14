@@ -62,7 +62,9 @@ class UpdateCommand extends Command<void> {
       final featureName = _extractFeatureName(fileName);
 
       if (featureName.isEmpty) {
-        progress.fail('Invalid config filename. Expected <feature-name>.config.json');
+        progress.fail(
+          'Invalid config filename. Expected <feature-name>.config.json',
+        );
         return;
       }
 
@@ -90,20 +92,21 @@ class UpdateCommand extends Command<void> {
       final featureOutputPath = p.join(outputPath, featureName);
 
       if (!Directory(featureOutputPath).existsSync()) {
-        progress.fail('Feature directory not found at $featureOutputPath. Use "create" first.');
+        progress.fail(
+          'Feature directory not found at $featureOutputPath. Use "create" first.',
+        );
         return;
       }
 
       final modelStrategy = argResults!['model'] as String;
       final generator = FeatureGenerator(logger: _logger);
-      
+
       await generator.generate(
         basePath: featureOutputPath,
         schema: schema,
         modelStrategy: modelStrategy,
         updateOnly: true,
       );
-
     } catch (e) {
       progress.fail('Failed to update feature: $e');
       _logger.err(e.toString());

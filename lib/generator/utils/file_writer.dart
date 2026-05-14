@@ -47,7 +47,8 @@ class FileWriter {
       // If no anchor, inject before the last closing brace
       final lastBraceIndex = content.lastIndexOf('}');
       if (lastBraceIndex != -1) {
-        content = content.substring(0, lastBraceIndex) +
+        content =
+            content.substring(0, lastBraceIndex) +
             '\n  $newContent\n' +
             content.substring(lastBraceIndex);
       }

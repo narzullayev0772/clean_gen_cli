@@ -69,10 +69,14 @@ class DataLayerGenerator {
           );
 
           // Inject Imports
-          final imports =
-              ApiServiceTemplate.generateSingleFunctionModelImports(function);
+          final imports = ApiServiceTemplate.generateSingleFunctionModelImports(
+            function,
+          );
           for (final imp in imports) {
-            await FileWriter.injectTopLevel(filePath: filePath, newContent: imp);
+            await FileWriter.injectTopLevel(
+              filePath: filePath,
+              newContent: imp,
+            );
           }
         }
       }
@@ -99,7 +103,8 @@ class DataLayerGenerator {
     for (final function in schema.functions) {
       // Generate request model
       if (function.request != null) {
-        final fileName = '${FileWriter.toSnakeCase(function.name)}_request.dart';
+        final fileName =
+            '${FileWriter.toSnakeCase(function.name)}_request.dart';
         final filePath = p.join(requestsPath, fileName);
 
         if (!updateOnly || !File(filePath).existsSync()) {
@@ -164,7 +169,10 @@ class DataLayerGenerator {
             '../models',
           );
           for (final imp in imports) {
-            await FileWriter.injectTopLevel(filePath: filePath, newContent: imp);
+            await FileWriter.injectTopLevel(
+              filePath: filePath,
+              newContent: imp,
+            );
           }
         }
       }

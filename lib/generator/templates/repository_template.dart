@@ -16,8 +16,9 @@ class RepositoryTemplate {
       '../../data/models',
     );
     final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
-    final dataStateImportLine =
-        dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
+    final dataStateImportLine = dataStateImport.isNotEmpty
+        ? "import '$dataStateImport';"
+        : "";
 
     return '''$dataStateImportLine
 $modelImports
@@ -52,12 +53,14 @@ class RepositoryImplTemplate {
     final modelImports = _generateModelImports(schema.functions, '../models');
 
     final baseRepoImport = schema.globalConfig.imports['base_repository'] ?? '';
-    final baseRepoImportLine =
-        baseRepoImport.isNotEmpty ? "import '$baseRepoImport';" : "";
+    final baseRepoImportLine = baseRepoImport.isNotEmpty
+        ? "import '$baseRepoImport';"
+        : "";
 
     final dataStateImport = schema.globalConfig.imports['data_state'] ?? '';
-    final dataStateImportLine =
-        dataStateImport.isNotEmpty ? "import '$dataStateImport';" : "";
+    final dataStateImportLine = dataStateImport.isNotEmpty
+        ? "import '$dataStateImport';"
+        : "";
 
     return '''import '../data_sources/${snakeName}_api_service.dart';
 import '../../domain/repositories/${snakeName}_repository.dart';

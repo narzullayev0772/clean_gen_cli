@@ -60,7 +60,10 @@ class DomainLayerGenerator {
             '../../data/models',
           );
           for (final imp in imports) {
-            await FileWriter.injectTopLevel(filePath: filePath, newContent: imp);
+            await FileWriter.injectTopLevel(
+              filePath: filePath,
+              newContent: imp,
+            );
           }
         }
       }
